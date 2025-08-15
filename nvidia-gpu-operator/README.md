@@ -29,29 +29,29 @@ node         Ready    control-plane,master,worker   4d21h   v1.23.17   172.28.0.
 
 Next, push the required images to your private registry. 
 
-The driver image version depends on the system and kernel version. For example, if the system is `Ubuntu 22.04` with kernel `5.15.0-131-generic`, the corresponding driver image tag is `5.15.0-131-generic-ubuntu22.04`. Push this image (`nvcr.io/nvidia/driver:5.15.0-131-generic-ubuntu22.04`) to your registry.
+The driver image version depends on the system and kernel version. For example, if the system is `Ubuntu 22.04` with kernel `5.15.0-131-generic`, the corresponding driver image tag is `5.15.0-131-generic-ubuntu22.04`. Push this image (`registry.cn-beijing.aliyuncs.com/kubesphereon/driver:5.15.0-131-generic-ubuntu22.04`) to your registry.
 
 Additionally, push the following images to your private registry:
 
 ```txt
-docker.io/kubesphere/node-feature-discovery:v0.14.2
-nvcr.io/nvidia/cloud-native/dcgm:3.3.0-1-ubuntu22.04
-nvcr.io/nvidia/cloud-native/gpu-operator-validator:v23.9.2
-nvcr.io/nvidia/cloud-native/k8s-cc-manager:v0.1.1
-nvcr.io/nvidia/cloud-native/k8s-driver-manager:v0.6.5
-nvcr.io/nvidia/cloud-native/k8s-kata-manager:v0.1.2
-nvcr.io/nvidia/cloud-native/k8s-mig-manager:v0.6.0-ubuntu20.04
-nvcr.io/nvidia/cloud-native/vgpu-device-manager:v0.2.4
-nvcr.io/nvidia/cuda:12.3.2-base-ubi8
-nvcr.io/nvidia/gpu-feature-discovery:v0.8.2-ubi8
-nvcr.io/nvidia/gpu-operator:v23.9.2
-nvcr.io/nvidia/k8s-device-plugin:v0.14.5-ubi8
-nvcr.io/nvidia/k8s/container-toolkit:v1.14.6-ubuntu20.04
-nvcr.io/nvidia/k8s/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04
-nvcr.io/nvidia/kubevirt-gpu-device-plugin:v1.2.4
+registry.cn-beijing.aliyuncs.com/kubesphereon/node-feature-discovery:v0.14.2
+registry.cn-beijing.aliyuncs.com/kubesphereon/dcgm:3.3.0-1-ubuntu22.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-operator-validator:v23.9.2
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-cc-manager:v0.1.1
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-driver-manager:v0.6.5
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-kata-manager:v0.1.2
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-mig-manager:v0.6.0-ubuntu20.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/vgpu-device-manager:v0.2.4
+registry.cn-beijing.aliyuncs.com/kubesphereon/cuda:12.3.2-base-ubi8
+registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-feature-discovery:v0.8.2-ubi8
+registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-operator:v23.9.2
+registry.cn-beijing.aliyuncs.com/kubesphereon-device-plugin:v0.14.5-ubi8
+registry.cn-beijing.aliyuncs.com/kubesphereon/container-toolkit:v1.14.6-ubuntu20.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/kubevirt-gpu-device-plugin:v1.2.4
 ```
 
-Finally, update the extension configuration to replace default image URLs with your private registry paths. For example, if your registry is `dockerhub.kubekey.local/kse`, modify `nvcr.io/nvidia/gpu-operator:v23.9.2` to `dockerhub.kubekey.local/kse/nvidia/gpu-operator:v23.9.2`.
+Finally, update the extension configuration to replace default image URLs with your private registry paths. For example, if your registry is `dockerhub.kubekey.local/kse`, modify `registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-operator:v23.9.2` to `dockerhub.kubekey.local/kse/nvidia/gpu-operator:v23.9.2`.
 
 > Note: The `driver.version` field excludes system suffixes.
 
@@ -175,7 +175,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: cuda-vectoradd
-    image: "nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04"
+    image: "registry.cn-beijing.aliyuncs.com/kubesphereon/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04"
     resources:
       limits:
         nvidia.com/gpu: 1

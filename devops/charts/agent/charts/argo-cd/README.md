@@ -226,7 +226,7 @@ NAME: my-release
 | global.additionalLabels | object | `{}` | Additional labels to add to all resources |
 | global.hostAliases | list | `[]` | Mapping between IP and hostnames that will be injected as entries in the pod's hosts files |
 | global.image.pullPolicy | string | `"IfNotPresent"` | If defined, a imagePullPolicy applied to all Argo CD deployments |
-| global.image.repository | string | `"quay.io/argoproj/argocd"` | If defined, a repository applied to all Argo CD deployments |
+| global.image.repository | string | `"registry.cn-beijing.aliyuncs.com/kubesphereon/argocd"` | If defined, a repository applied to all Argo CD deployments |
 | global.image.tag | string | `""` | Overrides the global Argo CD image tag whose default is the chart appVersion |
 | global.imagePullSecrets | list | `[]` | If defined, uses a Secret to pull an image from a private Docker registry or repository |
 | global.networkPolicy.create | bool | `false` | Create NetworkPolicy objects for all components |
@@ -534,7 +534,7 @@ NAME: my-release
 | dex.extraVolumeMounts | list | `[]` | Extra volumeMounts to the dex pod |
 | dex.extraVolumes | list | `[]` | Extra volumes to the dex pod |
 | dex.image.pullPolicy | string | `"IfNotPresent"` | Dex imagePullPolicy |
-| dex.image.repository | string | `"ghcr.io/dexidp/dex"` | Dex image repository |
+| dex.image.repository | string | `"registry.cn-beijing.aliyuncs.com/kubesphereon/dex"` | Dex image repository |
 | dex.image.tag | string | `"v2.30.2"` | Dex image tag |
 | dex.initContainers | list | `[]` | Init containers to add to the dex pod |
 | dex.initImage.pullPolicy | string | `""` (defaults to global.image.pullPolicy) | Argo CD init image imagePullPolicy |
@@ -674,7 +674,7 @@ NAME: my-release
 | applicationSet.extraVolumeMounts | list | `[]` | List of extra mounts to add (normally used with extraVolumes) |
 | applicationSet.extraVolumes | list | `[]` | List of extra volumes to add |
 | applicationSet.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the application set controller |
-| applicationSet.image.repository | string | `"quay.io/argoproj/argocd-applicationset"` | Repository to use for the application set controller |
+| applicationSet.image.repository | string | `"registry.cn-beijing.aliyuncs.com/kubesphereon/argocd-applicationset"` | Repository to use for the application set controller |
 | applicationSet.image.tag | string | `"v0.4.1"` | Tag to use for the application set controller |
 | applicationSet.image.pullSecrets | list | `[]` | If defined, uses a Secret to pull an image from a private Docker registry or repository. |
 | applicationSet.metrics.enabled | bool | `false` | Deploy metrics service |

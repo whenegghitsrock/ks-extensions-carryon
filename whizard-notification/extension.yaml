@@ -60,14 +60,14 @@ externalDependencies:
     required: false
 icon: ./static/favicon.svg
 images:
-  - docker.io/kubesphere/kubectl:v1.27.12
-  - docker.io/kubesphere/kube-rbac-proxy:v0.11.0
-  - docker.io/kubesphere/alertmanager-proxy:v0.2.0
-  - docker.io/kubesphere/notification-manager-operator:v2.5.2
-  - docker.io/kubesphere/notification-manager:v2.5.2
-  - docker.io/kubesphere/notification-tenant-sidecar:v4.0.2
-  - quay.io/prometheus/alertmanager:v0.27.0
-  - quay.io/prometheus-operator/prometheus-config-reloader:v0.75.1
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/kube-rbac-proxy:v0.11.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/alertmanager-proxy:v0.2.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/notification-manager-operator:v2.5.2
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/notification-manager:v2.5.2
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/notification-tenant-sidecar:v4.0.2
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/alertmanager:v0.27.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/prometheus-config-reloader:v0.75.1
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com

@@ -40,6 +40,6 @@ dependencies:
       - agent
 installationMode: Multicluster
 images:
-  - docker.io/kubesphere/network-extension-apiserver:v1.1.0
-  - docker.io/kubesphere/network-extension-controller:v1.1.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/network-extension-apiserver:v1.1.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/network-extension-controller:v1.1.0
 docs: https://docs.kubesphere.com.cn/

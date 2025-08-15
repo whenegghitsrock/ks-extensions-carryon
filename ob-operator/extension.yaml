@@ -40,5 +40,5 @@ externalDependencies:
   version: '>= 1.0.0-0'
   required: true
 images:
-- quay.io/oceanbase/ob-operator:2.3.2
-- docker.io/oceanbase/kube-rbac-proxy:v0.13.1
+- registry.cn-beijing.aliyuncs.com/kubesphereon/ob-operator:2.3.2
+- registry.cn-beijing.aliyuncs.com/kubesphereon/kube-rbac-proxy:v0.13.1

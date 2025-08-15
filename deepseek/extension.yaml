@@ -54,7 +54,7 @@ externalDependencies:
     required: false
 installationMode: HostOnly
 images:
-  - docker.io/ollama/ollama:0.5.7
-  - docker.io/ollama/ollama:rocm
-  - docker.io/yidadaa/chatgpt-next-web:v2.16.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/ollama:0.5.7
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/ollama:rocm
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/chatgpt-next-web:v2.16.0
 docs: https://docs.kubesphere.com.cn/

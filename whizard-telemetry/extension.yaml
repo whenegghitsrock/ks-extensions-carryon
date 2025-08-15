@@ -39,5 +39,5 @@ provider:
 staticFileDirectory: static
 icon: ./static/favicon.svg
 images:
-  - docker.io/kubesphere/whizard-telemetry-apiserver:v1.2.2
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-telemetry-apiserver:v1.2.2
 docs: https://docs.kubesphere.com.cn/

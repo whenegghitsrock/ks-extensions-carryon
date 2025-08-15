@@ -50,7 +50,7 @@ dependencies:
 # and the subchart with tag `agent` will be deployed to all selected clusters.
 installationMode: Multicluster
 images:
-- docker.io/kubesphere/gatekeeper-extension-apiserver:v1.0.2
-- docker.io/kubesphere/kubectl:v1.27.12
-- docker.io/openpolicyagent/gatekeeper:v3.14.0
-- docker.io/openpolicyagent/gatekeeper-crds:v3.14.0
+- registry.cn-beijing.aliyuncs.com/kubesphereon/gatekeeper-extension-apiserver:v1.0.2
+- registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
+- registry.cn-beijing.aliyuncs.com/kubesphereon/gatekeeper:v3.14.0
+- registry.cn-beijing.aliyuncs.com/kubesphereon/gatekeeper-crds:v3.14.0

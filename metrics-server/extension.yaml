@@ -41,6 +41,6 @@ dependencies:
 # and the subchart with tag `agent` will be deployed to all selected clusters.
 installationMode: Multicluster
 images:
-  - docker.io/kubesphere/metrics-server:v0.7.0
-  - docker.io/kubesphere/addon-resizer:1.8.20
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/metrics-server:v0.7.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/addon-resizer:1.8.20
 docs: https://docs.kubesphere.com.cn/

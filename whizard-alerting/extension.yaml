@@ -56,12 +56,12 @@ externalDependencies:
 staticFileDirectory: static
 icon: ./favicon.svg
 images:
-  - docker.io/kubesphere/whizard-alerting-apiserver:v1.0.2
-  - docker.io/kubesphere/whizard-alerting-controller-manager:v1.0.2
-  - docker.io/thanosio/thanos:v0.36.1
-  - docker.io/kubesphere/kubectl:v1.27.12
-  - docker.io/kubesphere/cortex-tenant:v1.12.5
-  - quay.io/prometheus-operator/prometheus-config-reloader:v0.75.1
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-alerting-apiserver:v1.0.2
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-alerting-controller-manager:v1.0.2
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/thanos:v0.36.1
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/cortex-tenant:v1.12.5
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/prometheus-config-reloader:v0.75.1
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com

@@ -41,7 +41,7 @@ gpu-operator:
       maxUnavailable: "1"
 
   validator:
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: gpu-operator-validator
     # If version is not specified, then default is to use chart.AppVersion
     #version: ""
@@ -56,7 +56,7 @@ gpu-operator:
           value: "false"
 
   operator:
-    repository: nvcr.io/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: gpu-operator
     # If version is not specified, then default is to use chart.AppVersion
     #version: ""
@@ -73,7 +73,7 @@ gpu-operator:
     upgradeCRD: false
     initContainer:
       image: cuda
-      repository: nvcr.io/nvidia
+      repository: registry.cn-beijing.aliyuncs.com/kubesphereon
       version: 12.3.2-base-ubi8
       imagePullPolicy: IfNotPresent
     tolerations:
@@ -132,7 +132,7 @@ gpu-operator:
     # use pre-compiled packages for NVIDIA driver installation.
     # only supported for as a tech-preview feature on ubuntu22.04 kernels.
     usePrecompiled: false
-    repository: nvcr.io/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: driver
     version: "550.54.14"
     imagePullPolicy: IfNotPresent
@@ -181,7 +181,7 @@ gpu-operator:
         deleteEmptyDir: false
     manager:
       image: k8s-driver-manager
-      repository: nvcr.io/nvidia/cloud-native
+      repository: registry.cn-beijing.aliyuncs.com/kubesphereon
       version: v0.6.5
       imagePullPolicy: IfNotPresent
       env:
@@ -218,7 +218,7 @@ gpu-operator:
 
   toolkit:
     enabled: true
-    repository: nvcr.io/nvidia/k8s
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: container-toolkit
     version: v1.14.6-ubuntu20.04
     imagePullPolicy: IfNotPresent
@@ -229,7 +229,7 @@ gpu-operator:
 
   devicePlugin:
     enabled: true
-    repository: nvcr.io/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: k8s-device-plugin
     version: v0.14.5-ubi8
     imagePullPolicy: IfNotPresent
@@ -283,7 +283,7 @@ gpu-operator:
   dcgm:
     # disabled by default to use embedded nv-hostengine by exporter
     enabled: false
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: dcgm
     version: 3.3.0-1-ubuntu22.04
     imagePullPolicy: IfNotPresent
@@ -294,7 +294,7 @@ gpu-operator:
 
   dcgmExporter:
     enabled: true
-    repository: nvcr.io/nvidia/k8s
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: dcgm-exporter
     version: 3.3.0-3.2.0-ubuntu22.04
     imagePullPolicy: IfNotPresent
@@ -321,7 +321,7 @@ gpu-operator:
 
   gfd:
     enabled: true
-    repository: nvcr.io/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: gpu-feature-discovery
     version: v0.8.2-ubi8
     imagePullPolicy: IfNotPresent
@@ -335,7 +335,7 @@ gpu-operator:
 
   migManager:
     enabled: true
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: k8s-mig-manager
     version: v0.6.0-ubuntu20.04
     imagePullPolicy: IfNotPresent
@@ -352,7 +352,7 @@ gpu-operator:
 
   nodeStatusExporter:
     enabled: false
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: gpu-operator-validator
     # If version is not specified, then default is to use chart.AppVersion
     #version: ""
@@ -362,7 +362,7 @@ gpu-operator:
 
   gds:
     enabled: false
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: nvidia-fs
     version: "2.17.5"
     imagePullPolicy: IfNotPresent
@@ -381,7 +381,7 @@ gpu-operator:
     resources: {}
     driverManager:
       image: k8s-driver-manager
-      repository: nvcr.io/nvidia/cloud-native
+      repository: registry.cn-beijing.aliyuncs.com/kubesphereon
       version: v0.6.4
       imagePullPolicy: IfNotPresent
       env:
@@ -392,7 +392,7 @@ gpu-operator:
 
   vgpuDeviceManager:
     enabled: true
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: vgpu-device-manager
     version: "v0.2.4"
     imagePullPolicy: IfNotPresent
@@ -404,7 +404,7 @@ gpu-operator:
 
   vfioManager:
     enabled: true
-    repository: nvcr.io/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: cuda
     version: 12.3.2-base-ubi8
     imagePullPolicy: IfNotPresent
@@ -413,7 +413,7 @@ gpu-operator:
     resources: {}
     driverManager:
       image: k8s-driver-manager
-      repository: nvcr.io/nvidia/cloud-native
+      repository: registry.cn-beijing.aliyuncs.com/kubesphereon
       version: v0.6.2
       imagePullPolicy: IfNotPresent
       env:
@@ -430,15 +430,15 @@ gpu-operator:
         - name: kata-qemu-nvidia-gpu
           nodeSelector: {}
           artifacts:
-            url: nvcr.io/nvidia/cloud-native/kata-gpu-artifacts:ubuntu22.04-535.54.03
+            url: registry.cn-beijing.aliyuncs.com/kubesphereon/kata-gpu-artifacts:ubuntu22.04-535.54.03
             pullSecret: ""
         - name: kata-qemu-nvidia-gpu-snp
           nodeSelector:
             "nvidia.com/cc.capable": "true"
           artifacts:
-            url: nvcr.io/nvidia/cloud-native/kata-gpu-artifacts:ubuntu22.04-535.86.10-snp
+            url: registry.cn-beijing.aliyuncs.com/kubesphereon/kata-gpu-artifacts:ubuntu22.04-535.86.10-snp
             pullSecret: ""
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: k8s-kata-manager
     version: v0.1.2
     imagePullPolicy: IfNotPresent
@@ -448,7 +448,7 @@ gpu-operator:
 
   sandboxDevicePlugin:
     enabled: true
-    repository: nvcr.io/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: kubevirt-gpu-device-plugin
     version: v1.2.4
     imagePullPolicy: IfNotPresent
@@ -460,7 +460,7 @@ gpu-operator:
   ccManager:
     enabled: false
     defaultMode: "off"
-    repository: nvcr.io/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kubesphereon
     image: k8s-cc-manager
     version: v0.1.1
     imagePullPolicy: IfNotPresent
@@ -472,7 +472,7 @@ gpu-operator:
 
   node-feature-discovery:
     image:
-      repository: docker.io/kubesphere/node-feature-discovery
+      repository: registry.cn-beijing.aliyuncs.com/kubesphereon/node-feature-discovery
       tag: v0.14.2
     enableNodeFeatureApi: true
     gc:

@@ -52,7 +52,7 @@ installationMode: Multicluster
 #    version: ">= 2.2.0"
 #    required: true
 images:
-  - docker.io/timberio/vector:0.39.0-debian
-  - docker.io/kubesphere/kubectl:v1.27.12
-  - docker.io/kubesphere/vector-config:v0.2.1
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/vector:0.39.0-debian
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/vector-config:v0.2.1
 docs: https://docs.kubesphere.com.cn/

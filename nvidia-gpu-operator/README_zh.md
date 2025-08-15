@@ -28,29 +28,29 @@ node         Ready    control-plane,master,worker   4d21h   v1.23.17   172.28.0.
 
 然后，推送相关镜像至您的本地私有镜像仓库。
 
-扩展组件安装时，驱动的镜像版本与系统及内核版本有关，如当前系统为 `Ubuntu 22.04`， 内核版本为 `5.15.0-131-generic`，则对应镜像的 tag 为 `5.15.0-131-generic-ubuntu22.04`， 驱动镜像为 `nvcr.io/nvidia/driver:5.15.0-131-generic-ubuntu22.04`，请将该驱动推送至本地私有镜像仓库。
+扩展组件安装时，驱动的镜像版本与系统及内核版本有关，如当前系统为 `Ubuntu 22.04`， 内核版本为 `5.15.0-131-generic`，则对应镜像的 tag 为 `5.15.0-131-generic-ubuntu22.04`， 驱动镜像为 `registry.cn-beijing.aliyuncs.com/kubesphereon/driver:5.15.0-131-generic-ubuntu22.04`，请将该驱动推送至本地私有镜像仓库。
 
 并且，将以下镜像推送至您的本地私有镜像仓库。
 
 ```txt
-docker.io/kubesphere/node-feature-discovery:v0.14.2
-nvcr.io/nvidia/cloud-native/dcgm:3.3.0-1-ubuntu22.04
-nvcr.io/nvidia/cloud-native/gpu-operator-validator:v23.9.2
-nvcr.io/nvidia/cloud-native/k8s-cc-manager:v0.1.1
-nvcr.io/nvidia/cloud-native/k8s-driver-manager:v0.6.5
-nvcr.io/nvidia/cloud-native/k8s-kata-manager:v0.1.2
-nvcr.io/nvidia/cloud-native/k8s-mig-manager:v0.6.0-ubuntu20.04
-nvcr.io/nvidia/cloud-native/vgpu-device-manager:v0.2.4
-nvcr.io/nvidia/cuda:12.3.2-base-ubi8
-nvcr.io/nvidia/gpu-feature-discovery:v0.8.2-ubi8
-nvcr.io/nvidia/gpu-operator:v23.9.2
-nvcr.io/nvidia/k8s-device-plugin:v0.14.5-ubi8
-nvcr.io/nvidia/k8s/container-toolkit:v1.14.6-ubuntu20.04
-nvcr.io/nvidia/k8s/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04
-nvcr.io/nvidia/kubevirt-gpu-device-plugin:v1.2.4
+registry.cn-beijing.aliyuncs.com/kubesphereon/node-feature-discovery:v0.14.2
+registry.cn-beijing.aliyuncs.com/kubesphereon/dcgm:3.3.0-1-ubuntu22.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-operator-validator:v23.9.2
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-cc-manager:v0.1.1
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-driver-manager:v0.6.5
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-kata-manager:v0.1.2
+registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-mig-manager:v0.6.0-ubuntu20.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/vgpu-device-manager:v0.2.4
+registry.cn-beijing.aliyuncs.com/kubesphereon/cuda:12.3.2-base-ubi8
+registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-feature-discovery:v0.8.2-ubi8
+registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-operator:v23.9.2
+registry.cn-beijing.aliyuncs.com/kubesphereon-device-plugin:v0.14.5-ubi8
+registry.cn-beijing.aliyuncs.com/kubesphereon/container-toolkit:v1.14.6-ubuntu20.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04
+registry.cn-beijing.aliyuncs.com/kubesphereon/kubevirt-gpu-device-plugin:v1.2.4
 ```
 
-最后，修改扩展组件配置，将多个默认镜像地址替换为本地镜像仓库地址。假如本地镜像仓库地址为 `dockerhub.kubekey.local/kse`，需将默认镜像地址，如 `nvcr.io/nvidia/gpu-operator:v23.9.2` 修改为 `dockerhub.kubekey.local/kse/nvidia/gpu-operator:v23.9.2`。
+最后，修改扩展组件配置，将多个默认镜像地址替换为本地镜像仓库地址。假如本地镜像仓库地址为 `dockerhub.kubekey.local/kse`，需将默认镜像地址，如 `registry.cn-beijing.aliyuncs.com/kubesphereon/gpu-operator:v23.9.2` 修改为 `dockerhub.kubekey.local/kse/nvidia/gpu-operator:v23.9.2`。
 
 > 注意：驱动镜像 `driver.version` 字段不包含系统后缀。
 
@@ -174,7 +174,7 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: cuda-vectoradd
-    image: "nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04"
+    image: "registry.cn-beijing.aliyuncs.com/kubesphereon/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04"
     resources:
       limits:
         nvidia.com/gpu: 1

@@ -43,6 +43,6 @@ dependencies:
 installationMode: HostOnly
 namespace: kubesphere-monitoring-system
 images:
-  - docker.io/curlimages/curl:7.85.0
-  - docker.io/grafana/grafana:10.4.1
-  - docker.io/library/busybox:1.31.1
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/curl:7.85.0
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/grafana:10.4.1
+  - registry.cn-beijing.aliyuncs.com/kubesphereon/busybox:1.31.1
