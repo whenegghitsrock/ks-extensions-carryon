@@ -67,7 +67,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-              registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}
+              docker.io/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}
 
       - name: Sync extension museum to ALIYUN
         run: |
