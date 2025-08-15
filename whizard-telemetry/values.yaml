@@ -47,7 +47,7 @@ whizard-telemetry:
 
   apiserver:
     image:
-      repository: kubesphere/whizard-telemetry-apiserver
+      repository: kubesphereon/whizard-telemetry-apiserver
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "v1.2.2"

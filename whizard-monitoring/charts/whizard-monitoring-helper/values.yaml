@@ -25,7 +25,7 @@ fullnameOverride: ""
 hook:
   image:
     registry: docker.io
-    repository: kubesphere/kubectl
+    repository: kubesphereon/kubectl
     tag: v1.27.12
     pullPolicy: IfNotPresent
   backoffLimit: 3

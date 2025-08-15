@@ -5,7 +5,7 @@ global:
 apps:
   enabled: true
   image:
-    repository: kubesphere/apps-manage
+    repository: kubesphereon/apps-manage
     pullPolicy: IfNotPresent
     tag: "v2.0.2"
   resources:

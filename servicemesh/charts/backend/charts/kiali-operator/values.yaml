@@ -3,7 +3,7 @@ fullnameOverride: ""
 
 image: # see: https://quay.io/repository/kiali/kiali-operator?tab=tags
   # registry: docker.io
-  repository: kubesphere/kiali-operator # quay.io/kiali/kiali-operator
+  repository: kubesphereon/kiali-operator # quay.io/kiali/kiali-operator
   tag: v1.59.1 # version string like v1.39.0 or a digest hash
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: Always

@@ -22,7 +22,7 @@ resources:
     cpu: 100m
     memory: 100Mi
 image:
-  repository: kubesphere/alertmanager-proxy
+  repository: kubesphereon/alertmanager-proxy
   tag: v0.2.0
   pullPolicy: IfNotPresent
 

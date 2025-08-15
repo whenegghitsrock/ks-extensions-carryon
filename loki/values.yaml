@@ -3,7 +3,7 @@ loki:
     dnsService: coredns
   kubectlImage:
     registry: docker.io
-    repository: kubesphere/kubectl
+    repository: kubesphereon/kubectl
     tag: v1.27.12
   loki:
     schemaConfig:

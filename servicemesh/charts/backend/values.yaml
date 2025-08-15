@@ -30,7 +30,7 @@ nodeSelector: {}
 kubectl:
   image:
     # registry: docker.io
-    repository: kubesphere/kubectl
+    repository: kubesphereon/kubectl
     # pullPolicy: IfNotPresent
     tag: "v1.27.4"
 
@@ -38,7 +38,7 @@ kubectl:
 
 apiserver:
   image:
-    repository: kubesphere/servicemesh-apiserver
+    repository: kubesphereon/servicemesh-apiserver
     pullPolicy: IfNotPresent
     tag: "v0.1.0"
   resources:
@@ -59,7 +59,7 @@ apiserver:
 
 controller:
   image:
-    repository: kubesphere/servicemesh-controller-manager
+    repository: kubesphereon/servicemesh-controller-manager
     pullPolicy: IfNotPresent
     tag: "v0.1.0"
   resources:

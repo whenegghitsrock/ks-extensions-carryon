@@ -12,7 +12,7 @@ whizard-monitoring-helper:
   hook:
     image:
       registry: docker.io
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       tag: v1.27.12
 
 kubePrometheusStack:
@@ -88,7 +88,7 @@ kube-prometheus-stack:
   kube-state-metrics:
     image:
       registry: docker.io
-      repository: kubesphere/kube-state-metrics
+      repository: kubesphereon/kube-state-metrics
       tag: v2.12.0
 
     kubeRBACProxy:
@@ -117,13 +117,13 @@ kube-prometheus-stack:
     ProcessExporter:
       enabled: false
       image:
-        repository: kubesphere/process-exporter
+        repository: kubesphereon/process-exporter
         tag: "0.5.0"
 
     CalicoExporter:
       enabled: false
       image:
-        repository: kubesphere/calico-exporter
+        repository: kubesphereon/calico-exporter
         tag: v0.3.0
 
   kubeEtcd:
@@ -144,6 +144,6 @@ dcgmExporter:
 
   image:
     registry: docker.io
-    repository: kubesphere/dcgm-exporter
+    repository: kubesphereon/dcgm-exporter
     tag: 3.3.5-3.4.0-ubuntu22.04
 

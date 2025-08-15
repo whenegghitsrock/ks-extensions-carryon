@@ -16,7 +16,7 @@ replicaCount: 1
 
 eventsExporter:
   image:
-    repository: kubesphere/kube-events-exporter
+    repository: kubesphereon/kube-events-exporter
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.8.0"

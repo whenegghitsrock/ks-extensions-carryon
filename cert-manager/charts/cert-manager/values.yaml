@@ -1351,5 +1351,5 @@ defaultIssuer:
   deleteJob:
     image:
       # registry: "docker.io"
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       tag: v1.33.1

@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: kubesphere/tower-extension
+  repository: kubesphereon/tower-extension
   pullPolicy: Always
   pullSecrets: []
   # Overrides the image tag whose default is the chart appVersion.

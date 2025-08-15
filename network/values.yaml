@@ -11,7 +11,7 @@ network:
   apiserver:
     image:
       # registry: docker.io
-      repository: kubesphere/network-extension-apiserver
+      repository: kubesphereon/network-extension-apiserver
       tag: "v1.1.0"
       pullPolicy: IfNotPresent
     resources:
@@ -25,7 +25,7 @@ network:
   controller:
     image:
       # registry: docker.io
-      repository: kubesphere/network-extension-controller
+      repository: kubesphereon/network-extension-controller
       tag: "v1.1.0"
       pullPolicy: IfNotPresent
     resources:

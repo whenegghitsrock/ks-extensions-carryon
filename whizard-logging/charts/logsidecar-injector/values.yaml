@@ -30,7 +30,7 @@ hook:
     backoffLimit: 1
 
 image:
-  repository: kubesphere/log-sidecar-injector
+  repository: kubesphereon/log-sidecar-injector
   tag: "" # If unset use v+ .Chart.appVersion
   pullPolicy: IfNotPresent
 

@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: kubesphere/kubefed-extension
+  repository: kubesphereon/kubefed-extension
   pullPolicy: Always
   pullSecrets: []
   # Overrides the image tag whose default is the chart appVersion.
@@ -47,7 +47,7 @@ affinity: {}
 
 kubectl:
   image:
-    repository: kubesphere/kubectl
+    repository: kubesphereon/kubectl
     pullPolicy: IfNotPresent
     pullSecrets: []
     tag: v1.27.4

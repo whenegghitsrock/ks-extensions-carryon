@@ -67,18 +67,17 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-              docker.io/kubesphere/ks-extensions-museum:${{ steps.prepare.outputs.version }}
-              registry.cn-beijing.aliyuncs.com/kubesphereio/ks-extensions-museum:${{ steps.prepare.outputs.version }}
+              docker.io/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}
 
-      - name: Login to HUAWEICLOUD
-        uses: docker/login-action@v3
-        with:
-          registry: swr.cn-southwest-2.myhuaweicloud.com
-          username: ${{ secrets.HUAWEICLOUD_USERNAME }}
-          password: ${{ secrets.HUAWEICLOUD_PASSWORD }}
-
-      - name: Sync extension museum to HUAWEICLOUD
+      - name: Sync extension museum to ALIYUN
         run: |
-          docker pull docker.io/kubesphere/ks-extensions-museum:${{ steps.prepare.outputs.version }}
-          docker tag docker.io/kubesphere/ks-extensions-museum:${{ steps.prepare.outputs.version }} swr.cn-southwest-2.myhuaweicloud.com/ks/kubesphere/ks-extensions-museum:${{ steps.prepare.outputs.version }}
-          docker push swr.cn-southwest-2.myhuaweicloud.com/ks/kubesphere/ks-extensions-museum:${{ steps.prepare.outputs.version }}
+          docker pull --platform linux/amd64 docker.io/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}
+          docker tag docker.io/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }} registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-amd64
+          docker push registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-amd64
+          docker pull --platform linux/arm64 docker.io/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}
+          docker tag docker.io/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }} registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-arm64
+          docker push registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-arm64
+          docker manifest create registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }} registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-arm64 registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-amd64
+          docker manifest annotate registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }} registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-arm64 --os linux --arch arm64
+          docker manifest annotate registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }} registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}-amd64 --os linux --arch amd64
+          docker manifest push registry.cn-beijing.aliyuncs.com/kubesphereon/ks-extensions-museum:${{ steps.prepare.outputs.version }}

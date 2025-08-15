@@ -28,7 +28,7 @@ backend:
     replicaCount: 1
 
     image:
-      repository: kubesphere/gateway-apiserver
+      repository: kubesphereon/gateway-apiserver
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "v1.0.2"
@@ -80,7 +80,7 @@ backend:
     replicaCount: 1
 
     image:
-      repository: kubesphere/gateway-controller-manager
+      repository: kubesphereon/gateway-controller-manager
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "v1.0.2"
@@ -141,7 +141,7 @@ backend:
   upgradeGateway:
     enabled: false
     image:
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: "v1.27.16"

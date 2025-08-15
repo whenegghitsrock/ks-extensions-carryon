@@ -45,7 +45,7 @@ controllermanager:
     annotations: {}
     replicaCount: 2
     image:
-      repository: kubesphere/kubefed
+      repository: kubesphereon/kubefed
       pullPolicy: IfNotPresent
       pullSecrets: []
       tag: v0.8.1
@@ -64,7 +64,7 @@ controllermanager:
   webhook:
     annotations: {}
     image:
-      repository: kubesphere/kubefed
+      repository: kubesphereon/kubefed
       pullPolicy: IfNotPresent
       pullSecrets: []
       tag: v0.8.1
@@ -89,7 +89,7 @@ controllermanager:
 
   postInstallJob:
     image:
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       pullPolicy: IfNotPresent
       pullSecrets: []
       tag: v1.27.4

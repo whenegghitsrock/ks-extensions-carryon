@@ -31,7 +31,7 @@ storageclassAccessor:
   enabled: true
   name: storageclass-accessor
   image:
-    repository: kubesphere/storageclass-accessor
+    repository: kubesphereon/storageclass-accessor
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: v0.2.5
@@ -55,7 +55,7 @@ snapshotController:
   enabled: true
   name: snapshot-controller
   image:
-    repository: kubesphere/snapshot-controller
+    repository: kubesphereon/snapshot-controller
     tag: v4.2.1
     pullPolicy: IfNotPresent
   commandArgs:
@@ -79,7 +79,7 @@ snapshotClassController:
   enabled: true
   name: snapshotclass-controller
   image:
-    repository: kubesphere/snapshotclass-controller
+    repository: kubesphereon/snapshotclass-controller
     tag: v0.0.1
     pullPolicy: IfNotPresent
   commandArgs:
@@ -99,7 +99,7 @@ pvcAutoResizer:
   enabled: true
   name: pvc-auto-resizer
   image:
-    repository: kubesphere/pvc-autoresizer
+    repository: kubesphereon/pvc-autoresizer
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: v0.3.1

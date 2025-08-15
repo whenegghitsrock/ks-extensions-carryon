@@ -14,7 +14,7 @@ extension:
         memory: 30Mi
 
     image:
-      repository: kubesphere/whizard-alerting-apiserver
+      repository: kubesphereon/whizard-alerting-apiserver
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
 
@@ -29,7 +29,7 @@ extension:
         memory: 30Mi
 
     image:
-      repository: kubesphere/whizard-alerting-controller-manager
+      repository: kubesphereon/whizard-alerting-controller-manager
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
 
@@ -63,7 +63,7 @@ extension:
 
   kubectl:
     image:
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       tag: "v1.27.12"
 
 agent:
@@ -137,5 +137,5 @@ agent:
   
   kubectl:
     image:
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       tag: "v1.27.12"

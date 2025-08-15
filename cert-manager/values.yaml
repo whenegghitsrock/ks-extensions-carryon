@@ -15,7 +15,7 @@ cert-manager:
         tlsKey: # Delete the default ClusterIssuer when uninstalling cert-manager
     deleteJob:
       image:
-        repository: kubesphere/kubectl
+        repository: kubesphereon/kubectl
         tag: v1.33.1
 
   # +docs:section=Global

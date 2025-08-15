@@ -95,7 +95,7 @@ gatekeeper:
     probeWebhook:
       enabled: true
       image:
-        repository: kubesphere/kubectl
+        repository: kubesphereon/kubectl
         tag: v1.27.12
         pullPolicy: IfNotPresent
         pullSecrets: []
@@ -269,12 +269,12 @@ agent:
   replicaCount: 1
   apiserver:
     image:
-      repository: kubesphere/gatekeeper-extension-apiserver
+      repository: kubesphereon/gatekeeper-extension-apiserver
       tag: "v1.0.2"
       pullPolicy: IfNotPresent
   kubectl:
     image:
-      repository: kubesphere/kubectl
+      repository: kubesphereon/kubectl
       tag: "v1.27.12"
       pullPolicy: IfNotPresent
   templates:
