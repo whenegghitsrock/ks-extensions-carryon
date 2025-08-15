@@ -65,7 +65,7 @@ spec:
       {{- end }}
       containers:
       - name: pre-install-job
-        image: '{{ default "docker.io" .Values.global.imageRegistry }}/kubesphere/kubectl:v1.27.4'
+        image: '{{ default "docker.io" .Values.global.imageRegistry }}/kubesphereon/kubectl:v1.27.4'
         command: ["/bin/bash"]
         args:
           - "-c"
