@@ -123,7 +123,7 @@ hostAliases: []
 #   - "bar.local"
 
 image:
-  repository: "opensearchproject/opensearch"
+  repository: "kubesphereon/opensearch"
   # override image tag, which is .Chart.AppVersion by default
   tag: "2.11.1"
   pullPolicy: "IfNotPresent"

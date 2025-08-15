@@ -4,7 +4,7 @@ global:
 
 opensearch-master:
   image:
-    repository: "opensearchproject/opensearch"
+    repository: "kubesphereon/opensearch"
     # override image tag, which is .Chart.AppVersion by default
     # change tag to an old version like "2.6.0" if OpenSearch pod failed to start on your node with old CPU with error log message "Fatal glibc error: CPU does not support x86-64-v2"
     tag: "2.8.0"
@@ -17,7 +17,7 @@ opensearch-master:
 #      memory: "512Mi"
 opensearch-data:
   image:
-    repository: "opensearchproject/opensearch"
+    repository: "kubesphereon/opensearch"
     # override image tag, which is .Chart.AppVersion by default
     # change tag to an old version like "2.6.0" if OpenSearch pod failed to start on your node with old CPU with error log message "Fatal glibc error: CPU does not support x86-64-v2"
     tag: "2.8.0"

@@ -6,10 +6,10 @@ ob-operator:
   controller:
     image:
       registry: ""
-      repository: "oceanbase/ob-operator"
+      repository: "kubesphereon/ob-operator"
       tag: "2.3.2"
   authProxy:
     image:
       registry: ""
-      repository: "oceanbase/kube-rbac-proxy"
+      repository: "kubesphereon/kube-rbac-proxy"
       tag: "v0.13.1"
