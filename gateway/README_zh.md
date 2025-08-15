@@ -26,7 +26,7 @@ backend:
         controller:
           image:
             registry: ""
-            image: kubesphere/ingress-nginx-controller
+            image: kubesphereon/ingress-nginx-controller
             tag: "v1.12.1"
             pullPolicy: IfNotPresent
             digest: ""

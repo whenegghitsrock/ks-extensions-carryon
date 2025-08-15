@@ -24,7 +24,7 @@ nodeSelector: {}
 hook:
   postInstall:
     image:
-      repo: kubesphere/kubectl
+      repo: kubesphereon/kubectl
       tag: v1.27.12
       pullPolicy: IfNotPresent
     backoffLimit: 1

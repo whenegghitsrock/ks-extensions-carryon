@@ -21,7 +21,7 @@ aggregator:
   hook:
     postInstall:
       image:
-        repo: kubesphere/kubectl
+        repo: kubesphereon/kubectl
         tag: v1.27.12
   vectorConfig:
     resources:
@@ -32,7 +32,7 @@ aggregator:
         cpu: 50m
         memory: 50Mi
     image:
-      repo: kubesphere/vector-config
+      repo: kubesphereon/vector-config
       tag: v0.2.1
       pullPolicy: IfNotPresent
   persistence:
@@ -96,7 +96,7 @@ agent:
   hook:
     postInstall:
       image:
-        repo: kubesphere/kubectl
+        repo: kubesphereon/kubectl
         tag: v1.27.12
   vectorConfig:
     resources:
@@ -107,7 +107,7 @@ agent:
         cpu: 50m
         memory: 50Mi
     image:
-      repo: kubesphere/vector-config
+      repo: kubesphereon/vector-config
       tag: v0.2.1
       pullPolicy: IfNotPresent
   affinity:
