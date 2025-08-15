@@ -74,5 +74,5 @@ maintainers:
     email: kubesphere@yunify.com
 docs: https://docs.kubesphere.com.cn/
 annotations:
-  executor-hook-image.kubesphere.io/install: kubesphere/whizard-monitoring-helm-init:v0.1.0
-  executor-hook-image.kubesphere.io/upgrade: kubesphere/whizard-monitoring-helm-init:v0.1.0
+  executor-hook-image.kubesphere.io/install: registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-monitoring-helm-init:v0.1.0
+  executor-hook-image.kubesphere.io/upgrade: registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-monitoring-helm-init:v0.1.0
