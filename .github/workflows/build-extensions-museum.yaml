@@ -16,7 +16,7 @@ on:
 jobs:
   build-multiarch:
     runs-on: ubuntu-latest
-    if: github.repository == 'kubesphere-extensions/ks-extensions'
+    if: github.repository == 'whenegghitsrock/ks-extensions-carryon'
     steps:
       - name: Prepare
         id: prepare
