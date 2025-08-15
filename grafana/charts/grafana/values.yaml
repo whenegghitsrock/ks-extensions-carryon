@@ -98,7 +98,7 @@ image:
   # -- The Docker registry
   registry: docker.io
   # -- Docker image repository
-  repository: grafana/grafana
+  repository: kubesphereon/grafana
   # Overrides the Grafana image tag whose default is the chart appVersion
   tag: ""
   sha: ""
@@ -173,7 +173,7 @@ extraLabels: {}
 downloadDashboardsImage:
   # -- The Docker registry
   registry: docker.io
-  repository: curlimages/curl
+  repository: kubesphereon/curl
   tag: 7.85.0
   sha: ""
   pullPolicy: IfNotPresent
@@ -393,7 +393,7 @@ initChownData:
   image:
     # -- The Docker registry
     registry: docker.io
-    repository: library/busybox
+    repository: kubesphereon/busybox
     tag: "1.31.1"
     sha: ""
     pullPolicy: IfNotPresent
@@ -838,7 +838,7 @@ sidecar:
   image:
     # -- The Docker registry
     registry: quay.io
-    repository: kiwigrid/k8s-sidecar
+    repository: kubesphereon/k8s-sidecar
     tag: 1.26.1
     sha: ""
   imagePullPolicy: IfNotPresent
@@ -1115,7 +1115,7 @@ imageRenderer:
     # -- The Docker registry
     registry: docker.io
     # image-renderer Image repository
-    repository: grafana/grafana-image-renderer
+    repository: kubesphereon/grafana-image-renderer
     # image-renderer Image tag
     tag: latest
     # image-renderer Image sha (optional)

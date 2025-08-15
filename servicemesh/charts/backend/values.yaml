@@ -81,7 +81,7 @@ controller:
 istioctl:
   image:
     # registry: docker.io
-    repository: istio/istioctl
+    repository: kubesphereon/istioctl
     tag: "1.16.5"
 
 ## === istio start ===
@@ -171,19 +171,19 @@ jaeger-operator:
 jaeger:
   image:
     operator:
-      repository: jaegertracing/jaeger-operator
+      repository: kubesphereon/jaeger-operator
       tag: "1.35"
     agent:
-      repository: jaegertracing/jaeger-agent
+      repository: kubesphereon/jaeger-agent
       tag: "1.35"
     collector:
-      repository: jaegertracing/jaeger-collector
+      repository: kubesphereon/jaeger-collector
       tag: "1.35"
     query:
-      repository: jaegertracing/jaeger-query
+      repository: kubesphereon/jaeger-query
       tag: "1.35"
     esIndexCleaner:
-      repository: jaegertracing/jaeger-es-index-cleaner
+      repository: kubesphereon/jaeger-es-index-cleaner
       tag: "1.35" 
   storage:
     options:

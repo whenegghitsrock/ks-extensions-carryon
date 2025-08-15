@@ -160,7 +160,7 @@ cert-manager:
 
     # The container image for the cert-manager controller.
     # +docs:property
-    repository: jetstack/cert-manager-controller
+    repository: kubesphereon/cert-manager-controller
 
     # Override the image tag to deploy by setting this variable.
     # If no value is set, the chart's appVersion is used.
@@ -823,7 +823,7 @@ cert-manager:
 
       # The container image for the cert-manager webhook
       # +docs:property
-      repository: jetstack/cert-manager-webhook
+      repository: kubesphereon/cert-manager-webhook
 
       # Override the image tag to deploy by setting this variable.
       # If no value is set, the chart's appVersion will be used.
@@ -1103,7 +1103,7 @@ cert-manager:
 
       # The container image for the cert-manager cainjector
       # +docs:property
-      repository: jetstack/cert-manager-cainjector
+      repository: kubesphereon/cert-manager-cainjector
 
       # Override the image tag to deploy by setting this variable.
       # If no value is set, the chart's appVersion will be used.
@@ -1162,7 +1162,7 @@ cert-manager:
 
       # The container image for the cert-manager acmesolver.
       # +docs:property
-      repository: jetstack/cert-manager-acmesolver
+      repository: kubesphereon/cert-manager-acmesolver
 
       # Override the image tag to deploy by setting this variable.
       # If no value is set, the chart's appVersion is used.
@@ -1286,7 +1286,7 @@ cert-manager:
 
       # The container image for the cert-manager startupapicheck.
       # +docs:property
-      repository: jetstack/cert-manager-startupapicheck
+      repository: kubesphereon/cert-manager-startupapicheck
 
       # Override the image tag to deploy by setting this variable.
       # If no value is set, the chart's appVersion is used.

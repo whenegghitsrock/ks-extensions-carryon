@@ -27,7 +27,7 @@ kube-prometheus-stack:
     prometheusSpec:
       image:
         registry: quay.io
-        repository: prometheus/prometheus
+        repository: kubesphereon/prometheus
         tag: v2.51.2
       replicas: 1
       retention: 7d
@@ -64,7 +64,7 @@ kube-prometheus-stack:
   prometheusOperator:
     image:
       registry: quay.io
-      repository: prometheus-operator/prometheus-operator
+      repository: kubesphereon/prometheus-operator
       tag: v0.75.1
 
     
@@ -78,7 +78,7 @@ kube-prometheus-stack:
     prometheusConfigReloader:
       image:
         registry: quay.io
-        repository: prometheus-operator/prometheus-config-reloader
+        repository: kubesphereon/prometheus-config-reloader
         tag: v0.75.1
     
     nodeSelector: {}
@@ -94,7 +94,7 @@ kube-prometheus-stack:
     kubeRBACProxy:
       image:
         registry: quay.io
-        repository: brancz/kube-rbac-proxy
+        repository: kubesphereon/kube-rbac-proxy
         tag: v0.18.0
 
     nodeSelector:
@@ -105,13 +105,13 @@ kube-prometheus-stack:
   prometheus-node-exporter:
     image:
       registry: quay.io
-      repository: prometheus/node-exporter
+      repository: kubesphereon/node-exporter
       tag: "v1.8.1"
 
     kubeRBACProxy:
       image:
         registry: quay.io
-        repository: brancz/kube-rbac-proxy
+        repository: kubesphereon/kube-rbac-proxy
         tag: v0.18.0
 
     ProcessExporter:

@@ -15,7 +15,7 @@ global:
   imagePullSecrets: []
   image:
     # -- If defined, a repository applied to all Argo CD deployments
-    repository: argoproj/argocd
+    repository: kubesphereon/argocd
     # -- Overrides the global Argo CD image tag whose default is the chart appVersion
     tag: ""
     # -- If defined, a pullPolicy applied to all Argo CD deployments
@@ -396,7 +396,7 @@ dex:
   image:
     registry: ghcr.io
     # -- Dex image repository
-    repository: dexidp/dex
+    repository: kubesphereon/dex
     # -- Dex image tag
     tag: v2.30.2
     # -- Dex pullPolicy
@@ -577,7 +577,7 @@ redis:
   image:
     registry: docker.io
     # -- Redis repository
-    repository: library/redis
+    repository: kubesphereon/redis
     # -- Redis tag
     tag: 6.2.6-alpine
     # -- Redis pullPolicy
@@ -1387,7 +1387,7 @@ server:
     image:
       registry: ghcr.io
       # -- Repository to use for extensions image
-      repository: argoproj-labs/argocd-extensions
+      repository: kubesphereon-labs/argocd-extensions
       # -- Tag to use for extensions image
       tag: "v0.1.0"
       # -- Image pull policy for extensions
@@ -1895,7 +1895,7 @@ applicationSet:
   image:
     registry: quay.io
     # -- Repository to use for the application set controller
-    repository: argoproj/argocd-applicationset
+    repository: kubesphereon/argocd-applicationset
     # -- Image pull policy for the application set controller
     pullPolicy: IfNotPresent
     # -- Tag to use for the application set controller

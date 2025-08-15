@@ -28,7 +28,7 @@ backend:
     image:
       # empty registry means using the global images.registry
       registry: ""
-      repository: ollama/ollama
+      repository: kubesphereon/ollama
       # empty tag means using the global images.tag
       tag: "0.5.7"
       digest: ""
@@ -80,7 +80,7 @@ backend:
     image:
       # empty registry means using the global images.registry
       registry: ""
-      repository: yidadaa/chatgpt-next-web
+      repository: kubesphereon/chatgpt-next-web
       # empty tag means using the global images.tag
       tag: "v2.16.0"
       digest: ""

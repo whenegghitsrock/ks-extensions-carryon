@@ -45,20 +45,20 @@ gatekeeper:
   resourceQuota: true
   externaldataProviderResponseCacheTTL: 3m
   image:
-    repository: openpolicyagent/gatekeeper
+    repository: kubesphereon/gatekeeper
     tag: v3.14.0
     pullPolicy: IfNotPresent
     pullSecrets: []
   preInstall:
     crdRepository:
       image:
-        repository: openpolicyagent/gatekeeper-crds
+        repository: kubesphereon/gatekeeper-crds
         tag: v3.14.0
   postUpgrade:
     labelNamespace:
       enabled: false
       image:
-        repository: openpolicyagent/gatekeeper-crds
+        repository: kubesphereon/gatekeeper-crds
         tag: v3.14.0
         pullPolicy: IfNotPresent
         pullSecrets: []
@@ -84,7 +84,7 @@ gatekeeper:
       enabled: false
       extraRules: []
       image:
-        repository: openpolicyagent/gatekeeper-crds
+        repository: kubesphereon/gatekeeper-crds
         tag: v3.14.0
         pullPolicy: IfNotPresent
         pullSecrets: []
@@ -120,7 +120,7 @@ gatekeeper:
       extraRules: []
       enabled: false
       image:
-        repository: openpolicyagent/gatekeeper-crds
+        repository: kubesphereon/gatekeeper-crds
         tag: v3.14.0
         pullPolicy: IfNotPresent
         pullSecrets: []

@@ -67,7 +67,7 @@ alertmanager:
 
   # alertmanager container config
   image:
-    repository: prometheus/alertmanager
+    repository: kubesphereon/alertmanager
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   resources:
@@ -101,7 +101,7 @@ alertmanager:
   configmapReload:
     enabled: true
     image:
-      repository: prometheus-operator/prometheus-config-reloader
+      repository: kubesphereon/prometheus-config-reloader
       tag: v0.75.1
     resources:
       limits:

@@ -196,7 +196,7 @@ persistence:
   enableInitChown: true
   # override image, which is busybox by default
   image:
-    repository: library/busybox
+    repository: kubesphereon/busybox
     # override image tag, which is latest by default
     tag: "1.35.0"
   labels:

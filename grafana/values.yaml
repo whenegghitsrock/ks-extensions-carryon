@@ -6,7 +6,7 @@ global:
 grafana:
   image:
     registry: docker.io
-    repository: grafana/grafana
+    repository: kubesphereon/grafana
     tag: "10.4.1"
 
   resources: {}
@@ -74,7 +74,7 @@ grafana:
     image:
       # -- The Docker registry
       registry: docker.io
-      repository: library/busybox
+      repository: kubesphereon/busybox
       tag: "1.31.1"
       sha: ""
       pullPolicy: IfNotPresent
@@ -100,7 +100,7 @@ grafana:
 
   downloadDashboardsImage:
     registry: docker.io
-    repository: curlimages/curl
+    repository: kubesphereon/curl
     tag: 7.85.0
 
   # Administrator credentials when not using an existing secret (see below)

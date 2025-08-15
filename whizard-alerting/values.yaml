@@ -94,7 +94,7 @@ agent:
 
     # ruler container config.
     image:
-      repository: thanosio/thanos
+      repository: kubesphereon/thanos
       tag: v0.36.1
     resources:
       limits:
@@ -111,7 +111,7 @@ agent:
     # configReloader config to set the container in charge of triggerring ruler container reload changed config.
     configReloader:
       image:
-        repository: prometheus-operator/prometheus-config-reloader
+        repository: kubesphereon/prometheus-config-reloader
         tag: v0.75.1
       resources:
         requests:

@@ -46,7 +46,7 @@ resources: {}
 
 configReloader:
   image:
-    repository: jimmidyson/configmap-reload
+    repository: kubesphereon/configmap-reload
     tag: v0.9.0
     pullPolicy: IfNotPresent
   resources: {}
@@ -61,19 +61,19 @@ sidecar:
   sidecarType: vector
   filebeatContainer:
     image:
-      repository: elastic/filebeat
+      repository: kubesphereon/filebeat
       tag: 6.7.0
       pullPolicy: IfNotPresent
     resources: {}
   vectorContainer:
     image:
-      repository: timberio/vector
+      repository: kubesphereon/vector
       tag: 0.39.0-debian
       pullPolicy: IfNotPresent
     resources: {}
   initContainer:
     image:
-      repository: library/alpine
+      repository: kubesphereon/alpine
       tag: 3.14
       pullPolicy: IfNotPresent
     resources: {}
