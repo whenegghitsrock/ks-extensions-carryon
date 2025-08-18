@@ -31,17 +31,17 @@ oceanbase-dashboard:
 dashboard:
   image:
     registry: ""
-    repository: "oceanbase/oceanbase-dashboard"
+    repository: "kubesphereon/oceanbase-dashboard"
     tag: ""
 prometheus:
   image:
     registry: ""
-    repository: "prometheus/prometheus"
+    repository: "kubesphereon/prometheus"
     tag: "v2.51.1"
 alertmanager:
   image:
     registry: ""
-    repository: "prometheus/alertmanager"
+    repository: "kubesphereon/alertmanager"
     tag: "v0.27.0"
 
 entrypoint:

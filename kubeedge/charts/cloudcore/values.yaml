@@ -9,7 +9,7 @@ cloudCore:
   replicaCount: 1
   hostNetWork: "false"
   image:
-    repository: "kubeedge/cloudcore"
+    repository: "kubesphereon/cloudcore"
     tag: "v1.13.1"
     pullPolicy: "IfNotPresent"
     pullSecrets: []
@@ -72,7 +72,7 @@ iptablesManager:
   mode: "external"
   hostNetWork: true
   image:
-    repository: "kubeedge/iptables-manager"
+    repository: "kubesphereon/iptables-manager"
     tag: "v1.13.1"
     pullPolicy: "IfNotPresent"
     pullSecrets: []
@@ -105,7 +105,7 @@ iptablesManager:
 controllerManager:
   enable: false
   image:
-    repository: "kubeedge/controller-manager"
+    repository: "kubesphereon/controller-manager"
     tag: "v1.13.1"
     pullPolicy: "IfNotPresent"
     pullSecrets: []
@@ -139,7 +139,7 @@ controllerManager:
 kubeEdgeProxy:
   replicaCount: 1
   image:
-    repository: "kubesphere/kubeedge-proxy"
+    repository: "kubesphereon/kubeedge-proxy"
     tag: "v0.4.1"
     pullPolicy: "IfNotPresent"
     pullSecrets: []
