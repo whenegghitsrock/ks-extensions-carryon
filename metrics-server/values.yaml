@@ -1,5 +1,5 @@
 global:
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
 
 metricsServer:
@@ -9,7 +9,7 @@ metrics-server:
   fullnameOverride: "metrics-server"
 
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/metrics-server
     tag: "v0.7.0"
 

@@ -19,7 +19,7 @@ spec:
       environment {
         DOCKER_CREDENTIAL_ID = 'dockerhub'
         KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
-        REGISTRY = 'docker.io'
+        REGISTRY = 'registry.cn-beijing.aliyuncs.com'
         DOCKERHUB_NAMESPACE = 'shaowenchen'
         APP_NAME = 'devops-python-sample'
         SONAR_CREDENTIAL_ID = 'sonar-token'

@@ -93,7 +93,7 @@ controller:
   name: application-controller
 
   image:
-    registry: quay.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Repository to use for the application controller
     # @default -- `""` (defaults to global.image.repository)
     repository: ""
@@ -402,7 +402,7 @@ dex:
     # -- Dex pullPolicy
     pullPolicy: IfNotPresent
   initImage:
-    registry: quay.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Argo CD init image repository
     # @default -- `""` (defaults to global.image.repository)
     repository: ""
@@ -575,7 +575,7 @@ redis:
   name: redis
 
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Redis repository
     repository: kubesphereon/redis
     # -- Redis tag
@@ -694,7 +694,7 @@ redis:
     # -- Deploy metrics service and redis-exporter sidecar
     enabled: false
     image:
-      registry: quay.io
+      registry: registry.cn-beijing.aliyuncs.com
       # -- redis-exporter image repository
       repository: bitnami/redis-exporter
       # -- redis-exporter image tag
@@ -816,7 +816,7 @@ server:
     targetMemoryUtilizationPercentage: 50
 
   image:
-    registry: quay.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Repository to use for the Argo CD server
     # @default -- `""` (defaults to global.image.repository)
     repository: "" # defaults to global.image.repository
@@ -1439,7 +1439,7 @@ repoServer:
     targetMemoryUtilizationPercentage: 50
 
   image:
-    registry: quay.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Repository to use for the repo server
     # @default -- `""` (defaults to global.image.repository)
     repository: "" # defaults to global.image.repository
@@ -1893,7 +1893,7 @@ applicationSet:
   replicaCount: 1
 
   image:
-    registry: quay.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Repository to use for the application set controller
     repository: kubesphereon/argocd-applicationset
     # -- Image pull policy for the application set controller
@@ -2095,7 +2095,7 @@ notifications:
   argocdUrl:
 
   image:
-    registry: quay.io
+    registry: registry.cn-beijing.aliyuncs.com
     # -- Repository to use for the notifications controller
     # @default -- `""` (defaults to global.image.repository)
     repository: ""
@@ -2526,7 +2526,7 @@ notifications:
         type: Recreate
 
       image:
-        registry: quay.io
+        registry: registry.cn-beijing.aliyuncs.com
         # -- Repository to use for the Slack bot
         # @default -- `""` (defaults to global.image.repository)
         repository: ""

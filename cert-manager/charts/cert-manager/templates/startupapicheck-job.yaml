@@ -47,7 +47,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}-startupapicheck
-          image: {{ default (default "quay.io" (.Values.global).imageRegistry) .Values.startupapicheck.image.registry }}/{{ .Values.startupapicheck.image.repository }}:{{ default .Chart.AppVersion .Values.startupapicheck.image.tag }}
+          image: {{ default (default "registry.cn-beijing.aliyuncs.com" (.Values.global).imageRegistry) .Values.startupapicheck.image.registry }}/{{ .Values.startupapicheck.image.repository }}:{{ default .Chart.AppVersion .Values.startupapicheck.image.tag }}
           imagePullPolicy: {{ .Values.startupapicheck.image.pullPolicy }}
           args:
           - check

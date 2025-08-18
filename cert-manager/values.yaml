@@ -1,5 +1,5 @@
 global:
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
 
 cert-manager:
@@ -156,7 +156,7 @@ cert-manager:
   image:
     # The container registry to pull the manager image from.
     # +docs:property
-    # registry: quay.io
+    # registry: registry.cn-beijing.aliyuncs.com
 
     # The container image for the cert-manager controller.
     # +docs:property
@@ -819,7 +819,7 @@ cert-manager:
     image:
       # The container registry to pull the webhook image from.
       # +docs:property
-      # registry: quay.io
+      # registry: registry.cn-beijing.aliyuncs.com
 
       # The container image for the cert-manager webhook
       # +docs:property
@@ -1099,7 +1099,7 @@ cert-manager:
     image:
       # The container registry to pull the cainjector image from.
       # +docs:property
-      # registry: quay.io
+      # registry: registry.cn-beijing.aliyuncs.com
 
       # The container image for the cert-manager cainjector
       # +docs:property
@@ -1158,7 +1158,7 @@ cert-manager:
     image:
       # The container registry to pull the acmesolver image from.
       # +docs:property
-      # registry: quay.io
+      # registry: registry.cn-beijing.aliyuncs.com
 
       # The container image for the cert-manager acmesolver.
       # +docs:property
@@ -1282,7 +1282,7 @@ cert-manager:
     image:
       # The container registry to pull the startupapicheck image from.
       # +docs:property
-      # registry: quay.io
+      # registry: registry.cn-beijing.aliyuncs.com
 
       # The container image for the cert-manager startupapicheck.
       # +docs:property

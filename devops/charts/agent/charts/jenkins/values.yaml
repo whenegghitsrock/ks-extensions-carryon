@@ -13,7 +13,7 @@ Master:
     SchedulerName: ""
   Name: jenkins-master
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/devops-jenkins
     tag: v4.1.2-2.346.3
     pullPolicy: IfNotPresent
@@ -391,7 +391,7 @@ Master:
 Agent:
   Enabled: true
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/inbound-agent
     tag: 4.10-2
     pullPolicy: IfNotPresent
@@ -427,7 +427,7 @@ Agent:
   builder:
     # containerRuntime: docker # Available values: docker, podman
     image:
-      registry: docker.io
+      registry: registry.cn-beijing.aliyuncs.com
       pullPolicy: IfNotPresent
       pullSecrets: []
     base:

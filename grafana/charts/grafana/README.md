@@ -66,7 +66,7 @@ need to instead set `global.imageRegistry`.
 | `readinessProbe`                          | Readiness Probe settings                      | `{ "httpGet": { "path": "/api/health", "port": 3000 } }`|
 | `securityContext`                         | Deployment securityContext                    | `{"runAsUser": 472, "runAsGroup": 472, "fsGroup": 472}`  |
 | `priorityClassName`                       | Name of Priority Class to assign pods         | `nil`                                                   |
-| `image.registry`                          | Image registry                                | `docker.io`                                       |
+| `image.registry`                          | Image registry                                | `registry.cn-beijing.aliyuncs.com`                                       |
 | `image.repository`                        | Image repository                              | `grafana/grafana`                                       |
 | `image.tag`                               | Overrides the Grafana image tag whose default is the chart appVersion (`Must be >= 5.0.0`) | ``                                                      |
 | `image.sha`                               | Image sha (optional)                          | ``                                                      |
@@ -120,7 +120,7 @@ need to instead set `global.imageRegistry`.
 | `persistence.inMemory.enabled`            | If persistence is not enabled, whether to mount the local storage in-memory to improve performance | `false`                                                   |
 | `persistence.inMemory.sizeLimit`          | SizeLimit for the in-memory local storage     | `nil`                                                   |
 | `initChownData.enabled`                   | If false, don't reset data ownership at startup | true                                                  |
-| `initChownData.image.registry`            | init-chown-data container image registry      | `docker.io`                                               |
+| `initChownData.image.registry`            | init-chown-data container image registry      | `registry.cn-beijing.aliyuncs.com`                                               |
 | `initChownData.image.repository`          | init-chown-data container image repository    | `busybox`                                               |
 | `initChownData.image.tag`                 | init-chown-data container image tag           | `1.31.1`                                                |
 | `initChownData.image.sha`                 | init-chown-data container image sha (optional)| `""`                                                    |
@@ -160,7 +160,7 @@ need to instead set `global.imageRegistry`.
 | `podLabels`                               | Pod labels                                    | `{}`                                                    |
 | `podPortName`                             | Name of the grafana port on the pod           | `grafana`                                               |
 | `lifecycleHooks`                          | Lifecycle hooks for podStart and preStop [Example](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/#define-poststart-and-prestop-handlers)     | `{}`                                                    |
-| `sidecar.image.registry`                  | Sidecar image registry                        | `quay.io`                          |
+| `sidecar.image.registry`                  | Sidecar image registry                        | `registry.cn-beijing.aliyuncs.com`                          |
 | `sidecar.image.repository`                | Sidecar image repository                      | `kiwigrid/k8s-sidecar`                          |
 | `sidecar.image.tag`                       | Sidecar image tag                             | `1.26.0`                                                |
 | `sidecar.image.sha`                       | Sidecar image sha (optional)                  | `""`                                                    |
@@ -240,7 +240,7 @@ need to instead set `global.imageRegistry`.
 | `command`                                 | Define command to be executed by grafana container at startup | `nil`                                   |
 | `args`                                    | Define additional args if command is used     | `nil`                                                   |
 | `testFramework.enabled`                   | Whether to create test-related resources      | `true`                                                  |
-| `testFramework.image.registry`            | `test-framework` image registry.            | `docker.io`                                             |
+| `testFramework.image.registry`            | `test-framework` image registry.            | `registry.cn-beijing.aliyuncs.com`                                             |
 | `testFramework.image.repository`          | `test-framework` image repository.            | `bats/bats`                                             |
 | `testFramework.image.tag`                 | `test-framework` image tag.                   | `v1.4.1`                                                |
 | `testFramework.imagePullPolicy`           | `test-framework` image pull policy.           | `IfNotPresent`                                          |
@@ -248,7 +248,7 @@ need to instead set `global.imageRegistry`.
 | `downloadDashboards.env`                  | Environment variables to be passed to the `download-dashboards` container | `{}`                        |
 | `downloadDashboards.envFromSecret`        | Name of a Kubernetes secret (must be manually created in the same namespace) containing values to be added to the environment. Can be templated | `""` |
 | `downloadDashboards.resources`            | Resources of `download-dashboards` container  | `{}`                                                    |
-| `downloadDashboardsImage.registry`        | Curl docker image registry                    | `docker.io`                                       |
+| `downloadDashboardsImage.registry`        | Curl docker image registry                    | `registry.cn-beijing.aliyuncs.com`                                       |
 | `downloadDashboardsImage.repository`      | Curl docker image repository                  | `curlimages/curl`                                       |
 | `downloadDashboardsImage.tag`             | Curl docker image tag                         | `7.73.0`                                                |
 | `downloadDashboardsImage.sha`             | Curl docker image sha (optional)              | `""`                                                    |
@@ -266,7 +266,7 @@ need to instead set `global.imageRegistry`.
 | `serviceMonitor.metricRelabelings`        | MetricRelabelConfigs to apply to samples before ingestion.  | `[]`                                      |
 | `revisionHistoryLimit`                    | Number of old ReplicaSets to retain           | `10`                                                    |
 | `imageRenderer.enabled`                    | Enable the image-renderer deployment & service                                     | `false`                          |
-| `imageRenderer.image.registry`             | image-renderer Image registry                                                      | `docker.io` |
+| `imageRenderer.image.registry`             | image-renderer Image registry                                                      | `registry.cn-beijing.aliyuncs.com` |
 | `imageRenderer.image.repository`           | image-renderer Image repository                                                    | `grafana/grafana-image-renderer` |
 | `imageRenderer.image.tag`                  | image-renderer Image tag                                                           | `latest`                         |
 | `imageRenderer.image.sha`                  | image-renderer Image sha (optional)                                                | `""`                             |

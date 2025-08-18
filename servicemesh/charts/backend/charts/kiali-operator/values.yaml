@@ -1,9 +1,9 @@
 nameOverride: ""
 fullnameOverride: ""
 
-image: # see: https://quay.io/repository/kiali/kiali-operator?tab=tags
-  # registry: docker.io
-  repository: kubesphereon/kiali-operator # quay.io/kiali/kiali-operator
+image: # see: https://registry.cn-beijing.aliyuncs.com/repository/kiali/kiali-operator?tab=tags
+  # registry: registry.cn-beijing.aliyuncs.com
+  repository: kubesphereon/kiali-operator # registry.cn-beijing.aliyuncs.com/kiali/kiali-operator
   tag: v1.59.1 # version string like v1.39.0 or a digest hash
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: Always

@@ -1,6 +1,6 @@
 global:
   # will override the all registry and tag if set
-  imageRegistry: docker.io
+  imageRegistry: registry.cn-beijing.aliyuncs.com
   tag:
   imagePullSecrets: []
 
@@ -10,7 +10,7 @@ network:
 
   apiserver:
     image:
-      # registry: docker.io
+      # registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/network-extension-apiserver
       tag: "v1.1.0"
       pullPolicy: IfNotPresent
@@ -24,7 +24,7 @@ network:
 
   controller:
     image:
-      # registry: docker.io
+      # registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/network-extension-controller
       tag: "v1.1.0"
       pullPolicy: IfNotPresent

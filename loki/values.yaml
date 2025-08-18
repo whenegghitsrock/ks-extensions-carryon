@@ -2,7 +2,7 @@ loki:
   global:
     dnsService: coredns
   kubectlImage:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/kubectl
     tag: v1.27.12
   loki:

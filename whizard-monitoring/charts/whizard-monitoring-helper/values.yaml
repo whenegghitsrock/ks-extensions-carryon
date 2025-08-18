@@ -5,7 +5,7 @@
 global:
   ## Global image registry to use if it needs to be overriden for some specific use cases (e.g local registries, custom images, ...)
   ##
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
 
   ## Reference to one or more secrets to be used when pulling images
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -24,7 +24,7 @@ fullnameOverride: ""
 
 hook:
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/kubectl
     tag: v1.27.12
     pullPolicy: IfNotPresent

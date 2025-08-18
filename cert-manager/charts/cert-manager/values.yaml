@@ -12,7 +12,7 @@ global:
   #    - name: "image-pull-secret"
   imagePullSecrets: []
 
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
 
   # Labels to apply to all resources.
   # Please note that this does not add labels to the resources created dynamically by the controllers.
@@ -138,7 +138,7 @@ maxConcurrentChallenges: 60
 image:
   # The container registry to pull the manager image from.
   # +docs:property
-  # registry: quay.io
+  # registry: registry.cn-beijing.aliyuncs.com
 
   # The container image for the cert-manager controller.
   # +docs:property
@@ -802,7 +802,7 @@ webhook:
   image:
     # The container registry to pull the webhook image from.
     # +docs:property
-    # registry: quay.io
+    # registry: registry.cn-beijing.aliyuncs.com
 
     # The container image for the cert-manager webhook
     # +docs:property
@@ -1081,7 +1081,7 @@ cainjector:
   image:
     # The container registry to pull the cainjector image from.
     # +docs:property
-    # registry: quay.io
+    # registry: registry.cn-beijing.aliyuncs.com
 
     # The container image for the cert-manager cainjector
     # +docs:property
@@ -1140,7 +1140,7 @@ acmesolver:
   image:
     # The container registry to pull the acmesolver image from.
     # +docs:property
-    # registry: quay.io
+    # registry: registry.cn-beijing.aliyuncs.com
 
     # The container image for the cert-manager acmesolver.
     # +docs:property
@@ -1264,7 +1264,7 @@ startupapicheck:
   image:
     # The container registry to pull the startupapicheck image from.
     # +docs:property
-    # registry: quay.io
+    # registry: registry.cn-beijing.aliyuncs.com
 
     # The container image for the cert-manager startupapicheck.
     # +docs:property
@@ -1350,6 +1350,6 @@ defaultIssuer:
       tlsKey: # deleteJob delete the default ClusterIssuer when uninstalling cert-manager
   deleteJob:
     image:
-      # registry: "docker.io"
+      # registry: "registry.cn-beijing.aliyuncs.com"
       repository: kubesphereon/kubectl
       tag: v1.33.1

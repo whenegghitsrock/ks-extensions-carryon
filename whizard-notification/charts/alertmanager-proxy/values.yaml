@@ -3,7 +3,7 @@ namespaceOverride: ""
 imageRegistryOverride: ""
 
 global:
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
   nodeSelector: {}
 

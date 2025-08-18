@@ -48,7 +48,7 @@ spec:
                   new version of edgecore. The image name consists of registry hostname
                   and repository name, if it includes the tag or digest, the tag or
                   digest will be overwritten by Version field above. If the registry
-                  hostname is empty, docker.io will be used as default. The default
+                  hostname is empty, registry.cn-beijing.aliyuncs.com will be used as default. The default
                   image name is: kubeedge/installation-package.'
                 type: string
               labelSelector:

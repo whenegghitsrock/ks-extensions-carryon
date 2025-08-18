@@ -1,5 +1,5 @@
 global:
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
 
 ob-operator:
   reporter: "kubesphere"

@@ -21851,7 +21851,7 @@ spec:
         env:
         - name: TELEMETRY_REPORTER
           value: {{ .Values.reporter }}
-        image: {{ default (default "quay.io" (.Values.global).imageRegistry) .Values.controller.image.registry }}/{{ .Values.controller.image.repository }}:{{ default .Chart.AppVersion .Values.controller.image.tag }}
+        image: {{ default (default "registry.cn-beijing.aliyuncs.com" (.Values.global).imageRegistry) .Values.controller.image.registry }}/{{ .Values.controller.image.repository }}:{{ default .Chart.AppVersion .Values.controller.image.tag }}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -21890,7 +21890,7 @@ spec:
         - --upstream=http://127.0.0.1:8080/
         - --logtostderr=true
         - --v=0
-        image: {{ default (default "docker.io" (.Values.global).imageRegistry) .Values.authProxy.image.registry }}/{{ .Values.authProxy.image.repository }}:{{ default "v0.13.1" .Values.authProxy.image.tag }}
+        image: {{ default (default "registry.cn-beijing.aliyuncs.com" (.Values.global).imageRegistry) .Values.authProxy.image.registry }}/{{ .Values.authProxy.image.repository }}:{{ default "v0.13.1" .Values.authProxy.image.tag }}
         name: kube-rbac-proxy
         ports:
         - containerPort: 8443

@@ -11,7 +11,7 @@ global:
     name: ""
     role: ""
   nodeSelector: {}
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
 
 affinity: {}

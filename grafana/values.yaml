@@ -5,7 +5,7 @@ global:
 
 grafana:
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/grafana
     tag: "10.4.1"
 
@@ -73,7 +73,7 @@ grafana:
     ##
     image:
       # -- The Docker registry
-      registry: docker.io
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/busybox
       tag: "1.31.1"
       sha: ""
@@ -99,7 +99,7 @@ grafana:
           - CHOWN
 
   downloadDashboardsImage:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/curl
     tag: 7.85.0
 

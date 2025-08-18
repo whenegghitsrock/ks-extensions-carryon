@@ -1,5 +1,5 @@
 global:
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
   clusterInfo: {}
 
@@ -11,7 +11,7 @@ whizard-monitoring-helper:
 
   hook:
     image:
-      registry: docker.io
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/kubectl
       tag: v1.27.12
 
@@ -26,7 +26,7 @@ kube-prometheus-stack:
 
     prometheusSpec:
       image:
-        registry: quay.io
+        registry: registry.cn-beijing.aliyuncs.com
         repository: kubesphereon/prometheus
         tag: v2.51.2
       replicas: 1
@@ -63,7 +63,7 @@ kube-prometheus-stack:
 
   prometheusOperator:
     image:
-      registry: quay.io
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/prometheus-operator
       tag: v0.75.1
 
@@ -71,13 +71,13 @@ kube-prometheus-stack:
     admissionWebhooks:
       patch:
         image:
-          registry: docker.io
+          registry: registry.cn-beijing.aliyuncs.com
           repository: kubesphereon/kube-webhook-certgen
           tag: v20221220-controller-v1.5.1-58-g787ea74b6
 
     prometheusConfigReloader:
       image:
-        registry: quay.io
+        registry: registry.cn-beijing.aliyuncs.com
         repository: kubesphereon/prometheus-config-reloader
         tag: v0.75.1
     
@@ -87,13 +87,13 @@ kube-prometheus-stack:
 
   kube-state-metrics:
     image:
-      registry: docker.io
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/kube-state-metrics
       tag: v2.12.0
 
     kubeRBACProxy:
       image:
-        registry: quay.io
+        registry: registry.cn-beijing.aliyuncs.com
         repository: kubesphereon/kube-rbac-proxy
         tag: v0.18.0
 
@@ -104,13 +104,13 @@ kube-prometheus-stack:
 
   prometheus-node-exporter:
     image:
-      registry: quay.io
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/node-exporter
       tag: "v1.8.1"
 
     kubeRBACProxy:
       image:
-        registry: quay.io
+        registry: registry.cn-beijing.aliyuncs.com
         repository: kubesphereon/kube-rbac-proxy
         tag: v0.18.0
 
@@ -143,7 +143,7 @@ dcgmExporter:
   nodeSelector: {}
 
   image:
-    registry: docker.io
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/dcgm-exporter
     tag: 3.3.5-3.4.0-ubuntu22.04
 

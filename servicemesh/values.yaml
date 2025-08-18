@@ -1,6 +1,6 @@
 global:
 
-  imageRegistry: docker.io
+  imageRegistry: registry.cn-beijing.aliyuncs.com
   imagePullSecrets: []
   imageTag: 
   

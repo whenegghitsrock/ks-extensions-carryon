@@ -59,7 +59,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}-cainjector
-          image: {{ default (default "quay.io" (.Values.global).imageRegistry) .Values.cainjector.image.registry }}/{{ .Values.cainjector.image.repository }}:{{ default .Chart.AppVersion .Values.cainjector.image.tag }}
+          image: {{ default (default "registry.cn-beijing.aliyuncs.com" (.Values.global).imageRegistry) .Values.cainjector.image.registry }}/{{ .Values.cainjector.image.repository }}:{{ default .Chart.AppVersion .Values.cainjector.image.tag }}
           imagePullPolicy: {{ .Values.cainjector.image.pullPolicy }}
           args:
           {{- /* The if statement below is equivalent to {{- if $value }} but will also return true for 0. */ -}}

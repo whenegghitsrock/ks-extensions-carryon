@@ -29,7 +29,7 @@ nodeSelector: {}
 
 kubectl:
   image:
-    # registry: docker.io
+    # registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/kubectl
     # pullPolicy: IfNotPresent
     tag: "v1.27.4"
@@ -80,7 +80,7 @@ controller:
 
 istioctl:
   image:
-    # registry: docker.io
+    # registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/istioctl
     tag: "1.16.5"
 
@@ -129,12 +129,12 @@ istio:
 
 kiali-operator:
   allowAdHocKialiImage: true
-  repository: kiali/kiali-operator # quay.io/kiali/kiali-operator
+  repository: kiali/kiali-operator # registry.cn-beijing.aliyuncs.com/kiali/kiali-operator
   tag: v1.59.1 # version string like v1.39.0 or a digest hash
 
 ## kiali
 kiali:
-  # registry: docker.io
+  # registry: registry.cn-beijing.aliyuncs.com
   repo: kubesphereon/kiali
   tag: "v1.59"
   prometheus_url: http://prometheus-k8s.kubesphere-monitoring-system.svc:9090

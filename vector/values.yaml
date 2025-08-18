@@ -161,7 +161,7 @@ agent:
         scrape_interval_secs: 60
 
 global:
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   nodeSelector: {}
   imagePullSecrets: []
   clusterInfo: {}

@@ -6,7 +6,7 @@ namespaceOverride: ""
 
 global:
   nodeSelector: {}
-  imageRegistry: ""
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
   clusterInfo: {}
 

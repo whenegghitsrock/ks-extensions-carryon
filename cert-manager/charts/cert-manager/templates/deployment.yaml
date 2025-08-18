@@ -77,7 +77,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}-controller
-          image: {{ default (default "quay.io" (.Values.global).imageRegistry) .Values.image.registry }}/{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
+          image: {{ default (default "registry.cn-beijing.aliyuncs.com" (.Values.global).imageRegistry) .Values.image.registry }}/{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
           {{- /* The if statement below is equivalent to {{- if $value }} but will also return true for 0. */ -}}
@@ -105,7 +105,7 @@ spec:
           - --leader-election-retry-period={{ .retryPeriod }}
           {{- end }}
           {{- end }}
-          - --acme-http01-solver-image="{{ default (default "quay.io" (.Values.global).imageRegistry) .Values.acmesolver.image.registry }}/{{ .Values.acmesolver.image.repository }}:{{ default .Chart.AppVersion .Values.acmesolver.image.tag }}"
+          - --acme-http01-solver-image="{{ default (default "registry.cn-beijing.aliyuncs.com" (.Values.global).imageRegistry) .Values.acmesolver.image.registry }}/{{ .Values.acmesolver.image.repository }}:{{ default .Chart.AppVersion .Values.acmesolver.image.tag }}"
           {{- with .Values.extraArgs }}
           {{- toYaml . | nindent 10 }}
           {{- end }}

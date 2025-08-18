@@ -1,5 +1,5 @@
 global:
-  imageRegistry: docker.io
+  imageRegistry: registry.cn-beijing.aliyuncs.com
   ## Optional array of imagePullSecrets containing private registry credentials
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   imagePullSecrets: [ ]
