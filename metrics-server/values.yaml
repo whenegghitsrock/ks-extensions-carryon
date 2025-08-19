@@ -28,6 +28,6 @@ metrics-server:
   addonResizer:
     enabled: false
     image:
-      registry: docker
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/addon-resizer
       tag: 1.8.20
