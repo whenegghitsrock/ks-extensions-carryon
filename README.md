@@ -54,3 +54,19 @@ If you encounter any problems while using these extensions or running related te
 # License
 
 This repository is licensed under the Apache License 2.0. For more details, see the [LICENSE](./LICENSE) file.
+
+## 💖 Support this Project  
+
+If you find this project useful, consider buying me a coffee ☕️.  
+
+### 💰 Crypto Donation  
+
+- **BTC**  
+  ![BTC QR Code](./donation/btc.png)  
+
+- **ETH**  
+  ![ETH QR Code](./donation/eth.png)  
+
+- **SOLANA**  
+  ![SOLANA QR Code](./donation/sol.png)  
+
