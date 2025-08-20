@@ -1350,6 +1350,6 @@ defaultIssuer:
       tlsKey: # deleteJob delete the default ClusterIssuer when uninstalling cert-manager
   deleteJob:
     image:
-      # registry: "registry.cn-beijing.aliyuncs.com"
+      registry: "registry.cn-beijing.aliyuncs.com"
       repository: kubesphereon/kubectl
       tag: v1.33.1
