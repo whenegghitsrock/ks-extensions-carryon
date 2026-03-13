@@ -47,8 +47,8 @@ externalDependencies:
     required: false
 installationMode: Multicluster
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/ingress-nginx-controller:v1.12.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/gateway-apiserver:v1.0.2
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/gateway-controller-manager:v1.0.2
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.16
+  - kubesphereon/ingress-nginx-controller:v1.12.1
+  - kubesphereon/gateway-apiserver:v1.0.2
+  - kubesphereon/gateway-controller-manager:v1.0.2
+  - kubesphereon/kubectl:v1.27.16
 docs: https://docs.kubesphere.com.cn/

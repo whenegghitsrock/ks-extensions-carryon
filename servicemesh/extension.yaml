@@ -52,17 +52,17 @@ externalDependencies:
     required: false
 installationMode: Multicluster
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/pilot:1.16.5
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/proxyv2:1.16.5
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/istioctl:1.16.5
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.4
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kiali-operator:v1.59.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kiali:v1.59
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/jaeger-operator:1.35.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/jaeger-agent:1.35
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/jaeger-collector:1.35
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/jaeger-query:1.35
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/jaeger-es-index-cleaner:1.35
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/servicemesh-apiserver:v0.1.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/servicemesh-controller-manager:v0.1.0
+  - kubesphereon/pilot:1.16.5
+  - kubesphereon/proxyv2:1.16.5
+  - kubesphereon/istioctl:1.16.5
+  - kubesphereon/kubectl:v1.27.4
+  - kubesphereon/kiali-operator:v1.59.1
+  - kubesphereon/kiali:v1.59
+  - kubesphereon/jaeger-operator:1.35.0
+  - kubesphereon/jaeger-agent:1.35
+  - kubesphereon/jaeger-collector:1.35
+  - kubesphereon/jaeger-query:1.35
+  - kubesphereon/jaeger-es-index-cleaner:1.35
+  - kubesphereon/servicemesh-apiserver:v0.1.0
+  - kubesphereon/servicemesh-controller-manager:v0.1.0
 docs: https://docs.kubesphere.com.cn/

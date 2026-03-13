@@ -55,24 +55,24 @@ externalDependencies:
     required: true
 namespace: kubesphere-monitoring-system
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kube-state-metrics:v2.12.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/thanos:v0.36.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kube-rbac-proxy:v0.18.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/prometheus-config-reloader:v0.75.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/prometheus-operator:v0.75.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/node-exporter:v1.8.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/prometheus:v2.51.2
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/dcgm-exporter:3.3.5-3.4.0-ubuntu22.04
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/process-exporter:0.5.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/nginx-unprivileged:1.24
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/calico-exporter:v0.3.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-monitoring-helm-init:v0.1.0
+  - kubesphereon/kubectl:v1.27.12
+  - kubesphereon/kube-state-metrics:v2.12.0
+  - kubesphereon/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6
+  - kubesphereon/thanos:v0.36.1
+  - kubesphereon/kube-rbac-proxy:v0.18.0
+  - kubesphereon/prometheus-config-reloader:v0.75.1
+  - kubesphereon/prometheus-operator:v0.75.1
+  - kubesphereon/node-exporter:v1.8.1
+  - kubesphereon/prometheus:v2.51.2
+  - kubesphereon/dcgm-exporter:3.3.5-3.4.0-ubuntu22.04
+  - kubesphereon/process-exporter:0.5.0
+  - kubesphereon/nginx-unprivileged:1.24
+  - kubesphereon/calico-exporter:v0.3.0
+  - kubesphereon/whizard-monitoring-helm-init:v0.1.0
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com
 docs: https://docs.kubesphere.com.cn/
 annotations:
-  executor-hook-image.kubesphere.io/install: registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-monitoring-helm-init:v0.1.0
-  executor-hook-image.kubesphere.io/upgrade: registry.cn-beijing.aliyuncs.com/kubesphereon/whizard-monitoring-helm-init:v0.1.0
+  executor-hook-image.kubesphere.io/install: kubesphereon/whizard-monitoring-helm-init:v0.1.0
+  executor-hook-image.kubesphere.io/upgrade: kubesphereon/whizard-monitoring-helm-init:v0.1.0

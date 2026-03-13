@@ -52,12 +52,12 @@ externalDependencies:
     version: '>=2.11.1'
     required: false
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/log-sidecar-injector:v1.3.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/configmap-reload:v0.9.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/filebeat:6.7.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/vector:0.39.0-debian
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/alpine:3.14
+  - kubesphereon/kubectl:v1.27.12
+  - kubesphereon/log-sidecar-injector:v1.3.0
+  - kubesphereon/configmap-reload:v0.9.0
+  - kubesphereon/filebeat:6.7.0
+  - kubesphereon/vector:0.39.0-debian
+  - kubesphereon/alpine:3.14
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com

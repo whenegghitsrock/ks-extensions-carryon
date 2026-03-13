@@ -35,16 +35,16 @@ dependencies:
       - agent
 installationMode: Multicluster
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.12
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/loki:3.0.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/loki-helm-test:ewelch-distributed-helm-chart-17db5ee
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/loki-canary:3.0.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/nginx-unprivileged:1.24-alpine
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/memcached:1.6.23-alpine
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/memcached-exporter:v0.14.2
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/k8s-sidecar:1.24.3
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/minio:RELEASE.2022-09-17T00-09-45Z
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/mc:RELEASE.2022-09-16T09-16-47Z
+  - kubesphereon/kubectl:v1.27.12
+  - kubesphereon/loki:3.0.0
+  - kubesphereon/loki-helm-test:ewelch-distributed-helm-chart-17db5ee
+  - kubesphereon/loki-canary:3.0.0
+  - kubesphereon/nginx-unprivileged:1.24-alpine
+  - kubesphereon/memcached:1.6.23-alpine
+  - kubesphereon/memcached-exporter:v0.14.2
+  - kubesphereon/k8s-sidecar:1.24.3
+  - kubesphereon/minio:RELEASE.2022-09-17T00-09-45Z
+  - kubesphereon/mc:RELEASE.2022-09-16T09-16-47Z
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com

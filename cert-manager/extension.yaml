@@ -39,9 +39,9 @@ dependencies:
 # and the subchart with tag `agent` will be deployed to all selected clusters.
 installationMode: Multicluster
 images:
-- registry.cn-beijing.aliyuncs.com/kubesphereon/cert-manager-controller:v1.15.1
-- registry.cn-beijing.aliyuncs.com/kubesphereon/cert-manager-cainjector:v1.15.1
-- registry.cn-beijing.aliyuncs.com/kubesphereon/cert-manager-webhook:v1.15.1
-- registry.cn-beijing.aliyuncs.com/kubesphereon/cert-manager-startupapicheck:v1.15.1
-- registry.cn-beijing.aliyuncs.com/kubesphereon/cert-manager-acmesolver:v1.15.1
-- registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.33.1
+- kubesphereon/cert-manager-controller:v1.15.1
+- kubesphereon/cert-manager-cainjector:v1.15.1
+- kubesphereon/cert-manager-webhook:v1.15.1
+- kubesphereon/cert-manager-startupapicheck:v1.15.1
+- kubesphereon/cert-manager-acmesolver:v1.15.1
+- kubesphereon/kubectl:v1.33.1

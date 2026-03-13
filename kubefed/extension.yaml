@@ -38,7 +38,7 @@ dependencies:
   - name: backend
     condition: backend.enabled
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubefed-extension:v1.0.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubefed:v0.8.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubectl:v1.27.4
+  - kubesphereon/kubefed-extension:v1.0.0
+  - kubesphereon/kubefed:v0.8.1
+  - kubesphereon/kubectl:v1.27.4
 docs: https://docs.kubesphere.com.cn/

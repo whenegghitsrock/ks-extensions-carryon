@@ -34,10 +34,10 @@ dependencies:
 icon: ./favicon.svg
 installationMode: HostOnly
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/iptables-manager:v1.13.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/cloudcore:v1.13.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/controller-manager:v1.13.1
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kubeedge-proxy:v0.4.1
+  - kubesphereon/iptables-manager:v1.13.1
+  - kubesphereon/cloudcore:v1.13.1
+  - kubesphereon/controller-manager:v1.13.1
+  - kubesphereon/kubeedge-proxy:v0.4.1
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com

@@ -46,10 +46,10 @@ dependencies:
       - agent
 installationMode: Multicluster
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/opensearch:2.8.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/busybox:1.35.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/opensearch-curator:v0.0.5
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/opensearch-dashboards:2.8.0
+  - kubesphereon/opensearch:2.8.0
+  - kubesphereon/busybox:1.35.0
+  - kubesphereon/opensearch-curator:v0.0.5
+  - kubesphereon/opensearch-dashboards:2.8.0
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com

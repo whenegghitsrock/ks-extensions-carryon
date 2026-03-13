@@ -48,8 +48,8 @@ externalDependencies:
 staticFileDirectory: static
 icon: ./static/favicon.svg
 images:
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/kube-events-exporter:v0.8.0
-  - registry.cn-beijing.aliyuncs.com/kubesphereon/configmap-reload:v0.9.0
+  - kubesphereon/kube-events-exporter:v0.8.0
+  - kubesphereon/configmap-reload:v0.9.0
 maintainers:
   - name: KubeSphere
     email: kubesphere@yunify.com
