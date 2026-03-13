@@ -11,7 +11,7 @@ global:
     name: ""
     role: ""
   nodeSelector: {}
-  imageRegistry: "registry.cn-beijing.aliyuncs.com"
+  imageRegistry: "dockerhub.kubekey.local"
   imagePullSecrets: []
 
 affinity: {}

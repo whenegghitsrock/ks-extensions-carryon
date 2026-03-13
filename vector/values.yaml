@@ -161,7 +161,7 @@ agent:
         scrape_interval_secs: 60
 
 global:
-  imageRegistry: "registry.cn-beijing.aliyuncs.com"
+  imageRegistry: "dockerhub.kubekey.local"
   nodeSelector: {}
   imagePullSecrets: []
   clusterInfo: {}

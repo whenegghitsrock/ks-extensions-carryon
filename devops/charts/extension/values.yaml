@@ -16,7 +16,7 @@ indexJsContent: >
 apiserver:
   replicas: 1
   image:
-    registry: registry.cn-beijing.aliyuncs.com
+    registry: dockerhub.kubekey.local
     repository: kubesphereon/devops-apiserver
     tag: v4.1.3
     pullPolicy: IfNotPresent

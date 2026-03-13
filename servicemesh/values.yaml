@@ -1,6 +1,6 @@
 global:
 
-  imageRegistry: registry.cn-beijing.aliyuncs.com
+  imageRegistry: dockerhub.kubekey.local
   imagePullSecrets: []
   imageTag: 
   

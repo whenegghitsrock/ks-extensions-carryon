@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 global:
-  imageRegistry: "registry.cn-beijing.aliyuncs.com"
+  imageRegistry: "dockerhub.kubekey.local"
   imagePullSecrets: []
 
 image:
