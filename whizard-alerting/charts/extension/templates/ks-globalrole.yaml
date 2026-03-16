@@ -1,0 +1,34 @@
+{{- if .Values.ksRbac.create }}
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRole
+metadata:
+  name: {{ include "extension.fullname" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+    - "iam.kubesphere.io"
+  resources:
+    - subjectaccessreviews
+  verbs:
+    - create
+{{- if ne (include "extension.distributionMode" .) "None" }}
+- nonResourceURLs:
+  - "{{ tpl .Values.apiserver.proxyRuler.path . }}/*"
+  verbs:
+  - "*"
+{{- end }}
+---
+{{- end }}
+
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRole
+metadata:
+  name: {{ include "extension.fullname" . }}-anonymous
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+rules:
+  - nonResourceURLs:
+      - /proxy/alerting.kubesphere.io/v2beta1/*
+    verbs:
+      - '*'

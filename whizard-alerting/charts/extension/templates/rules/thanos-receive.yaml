@@ -1,0 +1,247 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.thanos-receive.tmpl" }}
+
+{{- $receiveTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: thanos-receive
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "thanos-receive" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveHttpRequestErrorRateHigh | default false) }}
+  - alert: ThanosReceiveHttpRequestErrorRateHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to handle {{`{{`}}$value | humanize{{`}}`}}% of requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivehttprequesterrorratehigh
+      summary: Thanos Receive is failing to handle requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(http_requests_total{code=~"5..", job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}", handler="receive"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(http_requests_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}", handler="receive"}[5m]))
+      ) * 100 > 5
+    for: 5m
+    id: 4f6a8030fa12f3e52c59464b369dd4da
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveHttpRequestLatencyHigh | default false) }}
+  - alert: ThanosReceiveHttpRequestLatencyHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has a 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds for requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivehttprequestlatencyhigh
+      summary: Thanos Receive has high HTTP requests latency.
+    expr: |-
+      (
+        histogram_quantile(0.99, sum by (cluster, namespace, job, le) (rate(http_request_duration_seconds_bucket{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}", handler="receive"}[5m]))) > 10
+      and
+        sum by (cluster, namespace, job) (rate(http_request_duration_seconds_count{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}", handler="receive"}[5m])) > 0
+      )
+    for: 10m
+    id: a2f80f6e93fedf89b2cd1621036d7beb
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveHighReplicationFailures | default false) }}
+  - alert: ThanosReceiveHighReplicationFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to replicate {{`{{`}}$value | humanize{{`}}`}}% of requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivehighreplicationfailures
+      summary: Thanos Receive is having high number of replication failures.
+    expr: |-
+      thanos_receive_replication_factor > 1
+        and
+      (
+        (
+          sum by (cluster, namespace, job) (rate(thanos_receive_replications_total{result="error", job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m]))
+        /
+          sum by (cluster, namespace, job) (rate(thanos_receive_replications_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m]))
+        )
+        >
+        (
+          max by (cluster, namespace, job) (floor((thanos_receive_replication_factor{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}+1) / 2))
+        /
+          max by (cluster, namespace, job) (thanos_receive_hashring_nodes{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"})
+        )
+      ) * 100
+    for: 5m
+    id: bb53fa36ea68aea087635e62487a3562
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveHighForwardRequestFailures | default false) }}
+  - alert: ThanosReceiveHighForwardRequestFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to forward {{`{{`}}$value | humanize{{`}}`}}% of requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivehighforwardrequestfailures
+      summary: Thanos Receive is failing to forward requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_receive_forward_requests_total{result="error", job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(thanos_receive_forward_requests_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m]))
+      ) * 100 > 20
+    for: 5m
+    id: 5dd900efba8a4e7b50c90ea1c08377a7
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: info
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveHighHashringFileRefreshFailures | default false) }}
+  - alert: ThanosReceiveHighHashringFileRefreshFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to refresh hashring file, {{`{{`}}$value | humanize{{`}}`}} of attempts failed.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivehighhashringfilerefreshfailures
+      summary: Thanos Receive is failing to refresh hasring file.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_receive_hashrings_file_errors_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(thanos_receive_hashrings_file_refreshes_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m]))
+      > 0
+      )
+    for: 15m
+    id: e94deadcef33b6fe730d8a323634a8f3
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveConfigReloadFailure | default false) }}
+  - alert: ThanosReceiveConfigReloadFailure
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has not been able to reload hashring configurations.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceiveconfigreloadfailure
+      summary: Thanos Receive has not been able to reload configuration.
+    expr: avg by (cluster, namespace, job) (thanos_receive_config_last_reload_successful{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}) != 1
+    for: 5m
+    id: 60fbed45d162a08fa42a4b73fc4a0f61
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveNoUpload | default false) }}
+  - alert: ThanosReceiveNoUpload
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.instance{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has not uploaded latest data to object storage.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivenoupload
+      summary: Thanos Receive has not uploaded latest data to object storage.
+    expr: |-
+      (up{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"} - 1)
+      + on (cluster, namespace, job, instance) # filters to only alert on current instance last 3h
+      (sum by (cluster, namespace, job, instance) (increase(thanos_shipper_uploads_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[3h])) == 0)
+    for: 3h
+    id: becb9c502f40a2eb63f8e04809ac8e5e
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveLimitsConfigReloadFailure | default false) }}
+  - alert: ThanosReceiveLimitsConfigReloadFailure
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has not been able to reload the limits configuration.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivelimitsconfigreloadfailure
+      summary: Thanos Receive has not been able to reload the limits configuration.
+    expr: sum by(cluster, namespace, job) (increase(thanos_receive_limits_config_reload_err_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m])) > 0
+    for: 5m
+    id: 75aab5c91c7271dc2babf27660d453d9
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate | default false) }}
+  - alert: ThanosReceiveLimitsHighMetaMonitoringQueriesFailureRate
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing for {{`{{`}}$value | humanize{{`}}`}}% of meta monitoring queries.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivelimitshighmetamonitoringqueriesfailurerate
+      summary: Thanos Receive has not been able to update the number of head series.
+    expr: (sum by(cluster, namespace, job) (increase(thanos_receive_metamonitoring_failed_queries_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m])) / 20) * 100 > 20
+    for: 5m
+    id: b3e4ff063bbb094f0f5d29d8511065d0
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveTenantLimitedByHeadSeries | default false) }}
+  - alert: ThanosReceiveTenantLimitedByHeadSeries
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Receive tenant {{`{{`}}$labels.tenant{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is limited by head series.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceivetenantlimitedbyheadseries
+      summary: A Thanos Receive tenant is limited by head series.
+    expr: sum by(cluster, namespace, job, tenant) (increase(thanos_receive_head_series_limited_requests_total{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"}[5m])) > 0
+    for: 5m
+    id: 09cf7054afd23540b4259c1ba4740998
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

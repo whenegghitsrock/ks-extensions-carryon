@@ -1,0 +1,223 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.alertmanager-rules.tmpl" }}
+
+{{- $alertmanagerJob := printf "%s" "alertmanager" }}
+{{- $namespace := printf "%s" .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: alertmanager-rules
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "alertmanager-rules" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.AlertmanagerFailedReload | default false) }}
+  - alert: AlertmanagerFailedReload
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Configuration has failed to load for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerfailedreload
+      summary: Reloading an Alertmanager configuration has failed.
+    expr: |-
+      # Without max_over_time, failed scrapes could create false negatives, see
+      # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+      max_over_time(alertmanager_config_last_reload_successful{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[5m]) == 0
+    for: 10m
+    id: eab2d5ca2d8460850ad30dc27d726063
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerMembersInconsistent | default false) }}
+  - alert: AlertmanagerMembersInconsistent
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Alertmanager {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}} has only found {{`{{`}} $value {{`}}`}} members of the {{`{{`}}$labels.job{{`}}`}} cluster.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagermembersinconsistent
+      summary: A member of an Alertmanager cluster has not found all other cluster members.
+    expr: |-
+      # Without max_over_time, failed scrapes could create false negatives, see
+      # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+        max_over_time(alertmanager_cluster_members{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[5m])
+      < on (cluster,namespace,service) group_left
+        count by (cluster,namespace,service) (max_over_time(alertmanager_cluster_members{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[5m]))
+    for: 15m
+    id: 7d74f5a7464e75655f61fd44c9b9382c
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerFailedToSendAlerts | default false) }}
+  - alert: AlertmanagerFailedToSendAlerts
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Alertmanager {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}} failed to send {{`{{`}} $value | humanizePercentage {{`}}`}} of notifications to {{`{{`}} $labels.integration {{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerfailedtosendalerts
+      summary: An Alertmanager instance failed to send notifications.
+    expr: |-
+      (
+        rate(alertmanager_notifications_failed_total{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[5m])
+      /
+        rate(alertmanager_notifications_total{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[5m])
+      )
+      > 0.01
+    for: 5m
+    id: 98e8d890268d7edde59e8557ca084020
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerClusterFailedToSendAlerts | default false) }}
+  - alert: AlertmanagerClusterFailedToSendAlerts
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The minimum notification failure rate to {{`{{`}} $labels.integration {{`}}`}} sent from any instance in the {{`{{`}}$labels.job{{`}}`}} cluster is {{`{{`}} $value | humanizePercentage {{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerclusterfailedtosendalerts
+      summary: All Alertmanager instances in a cluster failed to send notifications to a critical integration.
+    expr: |-
+      min by (cluster,namespace,service, integration) (
+        rate(alertmanager_notifications_failed_total{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}", integration=~`.*`}[5m])
+      /
+        rate(alertmanager_notifications_total{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}", integration=~`.*`}[5m])
+      )
+      > 0.01
+    for: 5m
+    id: b376895c08b94ab96a01743d2f32436e
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerClusterFailedToSendAlerts | default false) }}
+  - alert: AlertmanagerClusterFailedToSendAlerts
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The minimum notification failure rate to {{`{{`}} $labels.integration {{`}}`}} sent from any instance in the {{`{{`}}$labels.job{{`}}`}} cluster is {{`{{`}} $value | humanizePercentage {{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerclusterfailedtosendalerts
+      summary: All Alertmanager instances in a cluster failed to send notifications to a non-critical integration.
+    expr: |-
+      min by (cluster,namespace,service, integration) (
+        rate(alertmanager_notifications_failed_total{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}", integration!~`.*`}[5m])
+      /
+        rate(alertmanager_notifications_total{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}", integration!~`.*`}[5m])
+      )
+      > 0.01
+    for: 5m
+    id: 3c8b88da259e058ca7413009a2de8b7a
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerConfigInconsistent | default false) }}
+  - alert: AlertmanagerConfigInconsistent
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have different configurations.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerconfiginconsistent
+      summary: Alertmanager instances within the same cluster have different configurations.
+    expr: |-
+      count by (cluster,namespace,service) (
+        count_values by (cluster,namespace,service) ("config_hash", alertmanager_config_hash{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"})
+      )
+      != 1
+    for: 20m
+    id: c66c3dab57e66549118aa3bfba0ca421
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerClusterDown | default false) }}
+  - alert: AlertmanagerClusterDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have been up for less than half of the last 5m.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerclusterdown
+      summary: Half or more of the Alertmanager instances within the same cluster are down.
+    expr: |-
+      (
+        count by (cluster,namespace,service) (
+          avg_over_time(up{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[5m]) < 0.5
+        )
+      /
+        count by (cluster,namespace,service) (
+          up{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}
+        )
+      )
+      >= 0.5
+    for: 5m
+    id: 032af165d93d54d29ff29eae1951f15b
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.AlertmanagerClusterCrashlooping | default false) }}
+  - alert: AlertmanagerClusterCrashlooping
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have restarted at least 5 times in the last 10m.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/alertmanager/alertmanagerclustercrashlooping
+      summary: Half or more of the Alertmanager instances within the same cluster are crashlooping.
+    expr: |-
+      (
+        count by (cluster,namespace,service) (
+          changes(process_start_time_seconds{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}[10m]) > 4
+        )
+      /
+        count by (cluster,namespace,service) (
+          up{job="{{ $alertmanagerJob }}",namespace="{{ $namespace }}"}
+        )
+      )
+      >= 0.5
+    for: 5m
+    id: a2ec3e19a125d4b13112a37ca0069ad8
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

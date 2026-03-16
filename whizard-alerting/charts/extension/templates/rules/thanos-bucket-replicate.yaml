@@ -1,0 +1,74 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.thanos-bucket-replicate.tmpl" }}
+
+{{- $bucketReplicateTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: thanos-bucket-replicate
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "thanos-bucket-replicate" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ThanosBucketReplicateErrorRate | default false) }}
+  - alert: ThanosBucketReplicateErrorRate
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Replicate is failing to run in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}}, {{`{{`}}$value | humanize{{`}}`}}% of attempts failed.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosbucketreplicateerrorrate
+      summary: Thanos Replicate is failing to run in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}}.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_replicate_replication_runs_total{result="error", job=~".*(thanos-bucket-replicate|bucket-replicate-whizard).*", namespace="{{ $bucketReplicateTargetNamespace }}"}[5m]))
+      / on (cluster, namespace, job) group_left
+        sum by (cluster, namespace, job) (rate(thanos_replicate_replication_runs_total{job=~".*(thanos-bucket-replicate|bucket-replicate-whizard).*", namespace="{{ $bucketReplicateTargetNamespace }}"}[5m]))
+      ) * 100 >= 10
+    for: 5m
+    id: c38756214bd9c90b68377245aecc77d3
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosBucketReplicateRunLatency | default false) }}
+  - alert: ThanosBucketReplicateRunLatency
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Replicate {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has a 99th percentile latency of {{`{{`}}$value{{`}}`}} seconds for the replicate operations.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosbucketreplicaterunlatency
+      summary: Thanos Replicate has a high latency for replicate operations.
+    expr: |-
+      (
+        histogram_quantile(0.99, sum by (cluster, namespace, job) (rate(thanos_replicate_replication_run_duration_seconds_bucket{job=~".*(thanos-bucket-replicate|bucket-replicate-whizard).*", namespace="{{ $bucketReplicateTargetNamespace }}"}[5m]))) > 20
+      and
+        sum by (cluster, namespace, job) (rate(thanos_replicate_replication_run_duration_seconds_bucket{job=~".*(thanos-bucket-replicate|bucket-replicate-whizard).*", namespace="{{ $bucketReplicateTargetNamespace }}"}[5m])) > 0
+      )
+    for: 5m
+    id: 901b9afbe81a93793fcda3387c3b5473
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

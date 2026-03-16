@@ -123,7 +123,7 @@ Return the istio install config
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
-  hub: {{ $.Values.global.imageRegistry }}/istio
+  hub: {{ $.Values.global.imageRegistry }}/kubesphereon
 
   components:
     base:

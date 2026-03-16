@@ -1,0 +1,578 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.node-exporter.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: node-exporter
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "node-exporter" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.NodeExporterDown | default false) }}
+  - alert: NodeExporterDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: NodeExporter target in node {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodeexporterdown
+      summary: Target is unreachable.
+    expr: up{job="node-exporter"} == 0
+    for: 15m
+    id: 67e20b9e809cee0dad8da55be7bb5771
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemSpaceFillingUp | default false) }}
+  - alert: NodeFilesystemSpaceFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemspacefillingup
+      summary: Filesystem is predicted to run out of space within the next 24 hours.
+    expr: |-
+      (
+        node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 15
+      and
+        predict_linear(node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 1h
+    id: 1edc003491066bcfc10f5aecbd4e2c7f
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemSpaceFillingUp | default false) }}
+  - alert: NodeFilesystemSpaceFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up fast.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemspacefillingup
+      summary: Filesystem is predicted to run out of space within the next 4 hours.
+    expr: |-
+      (
+        node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 10
+      and
+        predict_linear(node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 1h
+    id: 269f46476b7e978eb1cce0dc4a13fddf
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemAlmostOutOfSpace | default false) }}
+  - alert: NodeFilesystemAlmostOutOfSpace
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemalmostoutofspace
+      summary: Filesystem has less than 5% space left.
+    expr: |-
+      (
+        node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 5
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 30m
+    id: 9d746c60b086a39e5acdd80fb8f18599
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemAlmostOutOfSpace | default false) }}
+  - alert: NodeFilesystemAlmostOutOfSpace
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemalmostoutofspace
+      summary: Filesystem has less than 3% space left.
+    expr: |-
+      (
+        node_filesystem_avail_bytes{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 3
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 30m
+    id: 6f6f322dadd7b1c094d621727981ef93
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemFilesFillingUp | default false) }}
+  - alert: NodeFilesystemFilesFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemfilesfillingup
+      summary: Filesystem is predicted to run out of inodes within the next 24 hours.
+    expr: |-
+      (
+        node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 40
+      and
+        predict_linear(node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 1h
+    id: d244aba8ed103d3a664ef5773648b623
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemFilesFillingUp | default false) }}
+  - alert: NodeFilesystemFilesFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up fast.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemfilesfillingup
+      summary: Filesystem is predicted to run out of inodes within the next 4 hours.
+    expr: |-
+      (
+        node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 20
+      and
+        predict_linear(node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 1h
+    id: a2d5196f25a1572eac3344eb782f1fb9
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemAlmostOutOfFiles | default false) }}
+  - alert: NodeFilesystemAlmostOutOfFiles
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemalmostoutoffiles
+      summary: Filesystem has less than 5% inodes left.
+    expr: |-
+      (
+        node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 5
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 1h
+    id: 704d345a95aa7cd4db217d7740256d65
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFilesystemAlmostOutOfFiles | default false) }}
+  - alert: NodeFilesystemAlmostOutOfFiles
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Filesystem on {{`{{`}} $labels.device {{`}}`}}, mounted on {{`{{`}} $labels.mountpoint {{`}}`}}, at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefilesystemalmostoutoffiles
+      summary: Filesystem has less than 3% inodes left.
+    expr: |-
+      (
+        node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 3
+      and
+        node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+      )
+    for: 1h
+    id: 7c20b6519e0548c6835f119c72e5c602
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeNetworkReceiveErrs | default false) }}
+  - alert: NodeNetworkReceiveErrs
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} receive errors in the last two minutes.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodenetworkreceiveerrs
+      summary: Network interface is reporting many receive errors.
+    expr: rate(node_network_receive_errs_total{job="node-exporter"}[2m]) / rate(node_network_receive_packets_total{job="node-exporter"}[2m]) > 0.01
+    for: 1h
+    id: 82d8fa238e1526b7238f3dbb4f8d5d9c
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeNetworkTransmitErrs | default false) }}
+  - alert: NodeNetworkTransmitErrs
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} transmit errors in the last two minutes.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodenetworktransmiterrs
+      summary: Network interface is reporting many transmit errors.
+    expr: rate(node_network_transmit_errs_total{job="node-exporter"}[2m]) / rate(node_network_transmit_packets_total{job="node-exporter"}[2m]) > 0.01
+    for: 1h
+    id: b28d986367cb39577fc77c18a70e5eb1
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeHighNumberConntrackEntriesUsed | default false) }}
+  - alert: NodeHighNumberConntrackEntriesUsed
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of conntrack entries are used.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodehighnumberconntrackentriesused
+      summary: Number of conntrack are getting close to the limit.
+    expr: (node_nf_conntrack_entries{job="node-exporter"} / node_nf_conntrack_entries_limit) > 0.75
+    id: d83943b90de240b9c6b22076380d0449
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeTextFileCollectorScrapeError | default false) }}
+  - alert: NodeTextFileCollectorScrapeError
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Node Exporter text file collector on {{`{{`}} $labels.instance {{`}}`}} failed to scrape.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodetextfilecollectorscrapeerror
+      summary: Node Exporter text file collector failed to scrape.
+    expr: node_textfile_scrape_error{job="node-exporter"} == 1
+    id: 96df8aa76998ea01acd652db4ca59708
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeClockSkewDetected | default false) }}
+  - alert: NodeClockSkewDetected
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Clock at {{`{{`}} $labels.instance {{`}}`}} is out of sync by more than 0.05s. Ensure NTP is configured correctly on this host.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodeclockskewdetected
+      summary: Clock skew detected.
+    expr: |-
+      (
+        node_timex_offset_seconds{job="node-exporter"} > 0.05
+      and
+        deriv(node_timex_offset_seconds{job="node-exporter"}[5m]) >= 0
+      )
+      or
+      (
+        node_timex_offset_seconds{job="node-exporter"} < -0.05
+      and
+        deriv(node_timex_offset_seconds{job="node-exporter"}[5m]) <= 0
+      )
+    for: 10m
+    id: b6d779ce1e7ac1c836f0f73ba53719e8
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeClockNotSynchronising | default false) }}
+  - alert: NodeClockNotSynchronising
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Clock at {{`{{`}} $labels.instance {{`}}`}} is not synchronising. Ensure NTP is configured on this host.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodeclocknotsynchronising
+      summary: Clock not synchronising.
+    expr: |-
+      min_over_time(node_timex_sync_status{job="node-exporter"}[5m]) == 0
+      and
+      node_timex_maxerror_seconds{job="node-exporter"} >= 16
+    for: 10m
+    id: 45ef5f64189fb6e5c7612446a5ea7325
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeRAIDDegraded | default false) }}
+  - alert: NodeRAIDDegraded
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: RAID array '{{`{{`}} $labels.device {{`}}`}}' at {{`{{`}} $labels.instance {{`}}`}} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/noderaiddegraded
+      summary: RAID Array is degraded.
+    expr: node_md_disks_required{job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} - ignoring (state) (node_md_disks{state="active",job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}) > 0
+    for: 15m
+    id: d57c855e9c8398ad7397281275269ca1
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeRAIDDiskFailure | default false) }}
+  - alert: NodeRAIDDiskFailure
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: At least one device in RAID array at {{`{{`}} $labels.instance {{`}}`}} failed. Array '{{`{{`}} $labels.device {{`}}`}}' needs attention and possibly a disk swap.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/noderaiddiskfailure
+      summary: Failed device in RAID array.
+    expr: node_md_disks{state="failed",job="node-exporter",device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"} > 0
+    id: d206195006307821a803109973d71609
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFileDescriptorLimit | default false) }}
+  - alert: NodeFileDescriptorLimit
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefiledescriptorlimit
+      summary: Kernel is predicted to exhaust file descriptors limit soon.
+    expr: |-
+      (
+        node_filefd_allocated{job="node-exporter"} * 100 / node_filefd_maximum{job="node-exporter"} > 70
+      )
+    for: 15m
+    id: c870eace8c067b5c439e65f6f04af084
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeFileDescriptorLimit | default false) }}
+  - alert: NodeFileDescriptorLimit
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodefiledescriptorlimit
+      summary: Kernel is predicted to exhaust file descriptors limit soon.
+    expr: |-
+      (
+        node_filefd_allocated{job="node-exporter"} * 100 / node_filefd_maximum{job="node-exporter"} > 90
+      )
+    for: 15m
+    id: c975f50b606f686233d8a1f7b5459c05
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeCPUHighUsage | default false) }}
+  - alert: NodeCPUHighUsage
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'CPU usage at {{`{{`}} $labels.instance {{`}}`}} has been above 90% for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodecpuhighusage
+      summary: High CPU usage.
+    expr: sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job="node-exporter", mode!="idle"}[2m]))) * 100 > 90
+    for: 15m
+    id: 7f9a1c8508dd84657f2f55d3349b96f2
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: info
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeSystemSaturation | default false) }}
+  - alert: NodeSystemSaturation
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'System load per core at {{`{{`}} $labels.instance {{`}}`}} has been above 2 for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}.
+
+        This might indicate this instance resources saturation and can cause it becoming unresponsive.
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodesystemsaturation
+      summary: System saturated, load per core is very high.
+    expr: |-
+      node_load1{job="node-exporter"}
+      / count without (cpu, mode) (node_cpu_seconds_total{job="node-exporter", mode="idle"}) > 2
+    for: 15m
+    id: c5d1dfb608015696f6fa571564e6e6b4
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeMemoryMajorPagesFaults | default false) }}
+  - alert: NodeMemoryMajorPagesFaults
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'Memory major pages are occurring at very high rate at {{`{{`}} $labels.instance {{`}}`}}, 500 major page faults per second for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}.
+
+        Please check that there is enough memory available at this instance.
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodememorymajorpagesfaults
+      summary: Memory major page faults are occurring at very high rate.
+    expr: rate(node_vmstat_pgmajfault{job="node-exporter"}[5m]) > 500
+    for: 15m
+    id: 17d9f564a9e462aa51ad57c5ff7564cd
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeMemoryHighUtilization | default false) }}
+  - alert: NodeMemoryHighUtilization
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'Memory is filling up at {{`{{`}} $labels.instance {{`}}`}}, has been above 90% for the last 15 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodememoryhighutilization
+      summary: Host is running out of memory.
+    expr: 100 - (node_memory_MemAvailable_bytes{job="node-exporter"} / node_memory_MemTotal_bytes{job="node-exporter"} * 100) > 90
+    for: 15m
+    id: a98bd1d535a683cac0b7959d1aa9608c
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeDiskIOSaturation | default false) }}
+  - alert: NodeDiskIOSaturation
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'Disk IO queue (aqu-sq) is high on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}}, has been above 10 for the last 30 minutes, is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}.
+
+        This symptom might indicate disk saturation.
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodediskiosaturation
+      summary: Disk IO queue is high.
+    expr: rate(node_disk_io_time_weighted_seconds_total{job="node-exporter", device=~"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)"}[5m]) > 10
+    for: 30m
+    id: f3dc6e12c1a671072535b1657039172e
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeSystemdServiceFailed | default false) }}
+  - alert: NodeSystemdServiceFailed
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Systemd service {{`{{`}} $labels.name {{`}}`}} has entered failed state at {{`{{`}} $labels.instance {{`}}`}}
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodesystemdservicefailed
+      summary: Systemd service has entered failed state.
+    expr: node_systemd_unit_state{job="node-exporter", state="failed"} == 1
+    for: 5m
+    id: 1f795806f61a6594d8945c9acaece976
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.NodeBondingDegraded | default false) }}
+  - alert: NodeBondingDegraded
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Bonding interface {{`{{`}} $labels.master {{`}}`}} on {{`{{`}} $labels.instance {{`}}`}} is in degraded state due to one or more slave failures.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/node/nodebondingdegraded
+      summary: Bonding interface is degraded
+    expr: (node_bonding_slaves - node_bonding_active) != 0
+    for: 5m
+    id: b8193b264b0ff272d36703362605b40d
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

@@ -1,0 +1,15 @@
+{{- if eq .Values.role "Agent" }}
+{{- if .Values.sinks.opensearch.endpoints }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vector-sinks
+  namespace: {{ include "vector.namespaceOverride" . }}
+stringData:
+  {{- range $key, $value := .Values.sinks }}
+  {{ $key }}: |
+    {{- toYaml $value | nindent 4 }}
+  {{- end }}
+type: Opaque
+{{- end }}
+{{- end }}

@@ -1,0 +1,45 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kubernetes-system-controller-manager.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kubernetes-system-controller-manager
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kubernetes-system-controller-manager" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeControllerManagerDown | default false) }}
+  - alert: KubeControllerManagerDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: KubeControllerManager target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubecontrollermanagerdown
+      summary: Target is unreachable.
+    expr: up{job="kube-controller-manager"} == 0
+    for: 15m
+    id: 1d578c1a1146b22e3f92f954e3bb27d5
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

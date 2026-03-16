@@ -1,0 +1,67 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kubernetes-system.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kubernetes-system
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kubernetes-system" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeVersionMismatch | default false) }}
+  - alert: KubeVersionMismatch
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeversionmismatch
+      summary: Different semantic versions of Kubernetes components running.
+    expr: count by (cluster) (count by (git_version, cluster) (label_replace(kubernetes_build_info{job!~"kube-dns|coredns"},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*"))) > 1
+    for: 15m
+    id: c72c8ce8f9cb198349d17001489b37d9
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeClientErrors | default false) }}
+  - alert: KubeClientErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Kubernetes API server client '{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeclienterrors
+      summary: Kubernetes API server client is experiencing errors.
+    expr: |-
+      (sum(rate(rest_client_requests_total{job="apiserver",code=~"5.."}[5m])) by (cluster, instance, job, namespace)
+        /
+      sum(rate(rest_client_requests_total{job="apiserver"}[5m])) by (cluster, instance, job, namespace))
+      > 0.01
+    for: 15m
+    id: 0d831b24d7375c8df8841adf0fb355ab
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

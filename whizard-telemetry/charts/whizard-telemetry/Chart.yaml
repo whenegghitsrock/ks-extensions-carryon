@@ -1,0 +1,13 @@
+apiVersion: v2
+appVersion: v1.2.1
+description: A Helm chart for WhizardTelemetry
+maintainers:
+- email: benjamin@kubesphere.io
+  name: benjaminhuo
+- email: wanjunlei@kubesphere.io
+  name: wanjunlei
+- email: junhaozhang@kubesphere.io
+  name: frezes
+name: whizard-telemetry
+type: application
+version: 0.7.1

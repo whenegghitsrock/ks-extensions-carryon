@@ -1,0 +1,86 @@
+{{- if .Values.ksServiceAccount.create }}
+apiVersion: kubesphere.io/v1alpha1
+kind: ServiceAccount
+metadata:
+  name: {{ include "whizard-telemetry.ksServiceAccountName" . }}
+  namespace: {{ include "whizard-telemetry.namespace" . }}
+  labels:
+    {{- include "whizard-telemetry.labels" . | nindent 4 }}
+{{- end }}
+
+{{- if .Values.ksRbac.create }}
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRole
+metadata:
+  name: {{ include "whizard-telemetry.fullname" . }}
+  labels:
+    {{- include "whizard-telemetry.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "iam.kubesphere.io"
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - nonResourceURLs:
+      - /proxy/prometheus.io/*
+    verbs:
+      - '*'
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRoleBinding
+metadata:
+  name: {{ template "whizard-telemetry.fullname" . }}
+  labels:
+    {{- include "whizard-telemetry.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: iam.kubesphere.io
+  kind: GlobalRole
+  name: {{ include "whizard-telemetry.fullname" . }}
+subjects:
+  - apiGroup: kubesphere.io
+    kind: ServiceAccount
+    name: {{ include "whizard-telemetry.ksServiceAccountName" . }}
+    namespace: {{ include "whizard-telemetry.namespace" . }}
+
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRole
+metadata:
+  name: {{ include "whizard-telemetry.fullname" . }}-anonymous
+rules:
+  - resources:
+      - '*'
+    apiGroups:
+      - 'logging.kubesphere.io'
+      - 'monitoring.kubesphere.io'
+    verbs:
+      - '*'
+  - nonResourceURLs:
+      - /proxy/monitoring.kubesphere.io/v1beta1/*
+    verbs:
+      - '*'
+
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRoleBinding
+metadata:
+  name: {{ include "whizard-telemetry.fullname" . }}-anonymous
+roleRef:
+  apiGroup: iam.kubesphere.io
+  kind: GlobalRole
+  name: {{ include "whizard-telemetry.fullname" . }}-anonymous
+subjects:
+  - apiGroup: iam.kubesphere.io
+    kind: Group
+    name: system:authenticated
+{{- end }}

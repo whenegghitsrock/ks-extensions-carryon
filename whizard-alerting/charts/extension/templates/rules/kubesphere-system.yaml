@@ -1,0 +1,112 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kubesphere-system.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kubesphere-system
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kubesphere-system" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeConfigCertificateExpiration | default false) }}
+  - alert: KubeConfigCertificateExpiration
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: '{{`{{`}} $labels.cluster {{`}}`}} cluster kubeconfig certificate will be expired in less than 7.0 days.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/kubeconfigcertificateexpiration
+      summary: kubeconfig certificate is about to expire.
+    expr: kubesphere_enterprise_cluster_certificate_validity_seconds{job="ks-controller-manager"} <  604800
+    id: 1006265643e276bb2359a136b8f899e7
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeConfigCertificateExpiration | default false) }}
+  - alert: KubeConfigCertificateExpiration
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: '{{`{{`}} $labels.cluster {{`}}`}} cluster kubeconfig certificate will be expired in less than 24.0 hours.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/kubeconfigcertificateexpiration
+      summary: kubeconfig certificate is about to expire.
+    expr: kubesphere_enterprise_cluster_certificate_validity_seconds{job="ks-controller-manager"} <  86400
+    id: 74dceb0d64ae72c38755f0fd241d25c7
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeSphereLicenseExpiration | default false) }}
+  - alert: KubeSphereLicenseExpiration
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: KubeSphere license will be expired in {{`{{`}} $value | humanizeDuration {{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/kubespherelicenseexpiration
+      summary: KubeSphere license is about to expire.
+    expr: 0 < kubesphere_enterprise_license_validity_seconds{job="ks-controller-manager"} < 2592000
+    id: c20aad7cf1cc7a9af9f02a3118a97f0c
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeSphereLicenseExpiration | default false) }}
+  - alert: KubeSphereLicenseExpiration
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: KubeSphere license will be expired in {{`{{`}} $value | humanizeDuration {{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/kubespherelicenseexpiration
+      summary: KubeSphere license is about to expire.
+    expr: 0 < kubesphere_enterprise_license_validity_seconds{job="ks-controller-manager"} < 86400
+    id: 983e29af8ea57fc6ef6b1214a6aabdc7
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeSphereLicenseExpired | default false) }}
+  - alert: KubeSphereLicenseExpired
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: KubeSphere license has been expired.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/kubespherelicenseexpired
+      summary: KubeSphere license has been expired.
+    expr: kubesphere_enterprise_license_validity_seconds{job="ks-controller-manager"} <= 0
+    id: 0e5669f3b30bc43f90a2901f0d8074e0
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

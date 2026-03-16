@@ -1,0 +1,45 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.node-network.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: node-network
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "node-network" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.NodeNetworkInterfaceFlapping | default false) }}
+  - alert: NodeNetworkInterfaceFlapping
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Network interface "{{`{{`}} $labels.device {{`}}`}}" changing its up status often on node-exporter {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}}
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/general/nodenetworkinterfaceflapping
+      summary: Network interface is often changing its status
+    expr: changes(node_network_up{job="node-exporter",device!~"veth.+"}[2m]) > 2
+    for: 2m
+    id: 62864be7b7ed1b8a84939fefadca1167
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

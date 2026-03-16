@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.4.0
+description: A Helm chart for OceanBase dashboard
+name: oceanbase-dashboard
+type: application
+version: 0.4.0

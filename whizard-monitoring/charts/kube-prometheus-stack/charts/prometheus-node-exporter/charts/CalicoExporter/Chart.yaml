@@ -1,0 +1,14 @@
+apiVersion: v2
+appVersion: 0.3.0
+description: A Helm chart for Calico Exporter on Kubernetes
+keywords:
+- calico
+- prometheus
+- exporter
+kubeVersion: '>=v1.19.0-0'
+maintainers:
+- email: wangyifei@kubesphere.io
+  name: wangyifei
+name: CalicoExporter
+type: application
+version: 0.3.0

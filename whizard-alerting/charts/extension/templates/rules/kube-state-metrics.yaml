@@ -1,0 +1,111 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kube-state-metrics.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kube-state-metrics
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kube-state-metrics" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeStateMetricsListErrors | default false) }}
+  - alert: KubeStateMetricsListErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: kube-state-metrics is experiencing errors at an elevated rate in list operations. This is likely causing it to not be able to expose metrics about Kubernetes objects correctly or at all.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kube-state-metrics/kubestatemetricslisterrors
+      summary: kube-state-metrics is experiencing errors in list operations.
+    expr: |-
+      (sum(rate(kube_state_metrics_list_total{job="kube-state-metrics",result="error"}[5m])) by (cluster)
+        /
+      sum(rate(kube_state_metrics_list_total{job="kube-state-metrics"}[5m])) by (cluster))
+      > 0.01
+    for: 15m
+    id: 0e7897c5cfbca8933deedd7475be2e6f
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeStateMetricsWatchErrors | default false) }}
+  - alert: KubeStateMetricsWatchErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: kube-state-metrics is experiencing errors at an elevated rate in watch operations. This is likely causing it to not be able to expose metrics about Kubernetes objects correctly or at all.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kube-state-metrics/kubestatemetricswatcherrors
+      summary: kube-state-metrics is experiencing errors in watch operations.
+    expr: |-
+      (sum(rate(kube_state_metrics_watch_total{job="kube-state-metrics",result="error"}[5m])) by (cluster)
+        /
+      sum(rate(kube_state_metrics_watch_total{job="kube-state-metrics"}[5m])) by (cluster))
+      > 0.01
+    for: 15m
+    id: 152ccb43660a19968a830ae2050f1855
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeStateMetricsShardingMismatch | default false) }}
+  - alert: KubeStateMetricsShardingMismatch
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: kube-state-metrics pods are running with different --total-shards configuration, some Kubernetes objects may be exposed multiple times or not exposed at all.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kube-state-metrics/kubestatemetricsshardingmismatch
+      summary: kube-state-metrics sharding is misconfigured.
+    expr: stdvar (kube_state_metrics_total_shards{job="kube-state-metrics"}) by (cluster) != 0
+    for: 15m
+    id: 1e8f579922412497e9b3d29c412b31fe
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeStateMetricsShardsMissing | default false) }}
+  - alert: KubeStateMetricsShardsMissing
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: kube-state-metrics shards are missing, some Kubernetes objects are not being exposed.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kube-state-metrics/kubestatemetricsshardsmissing
+      summary: kube-state-metrics shards are missing.
+    expr: |-
+      2^max(kube_state_metrics_total_shards{job="kube-state-metrics"}) by (cluster) - 1
+        -
+      sum( 2 ^ max by (cluster, shard_ordinal) (kube_state_metrics_shard_ordinal{job="kube-state-metrics"}) ) by (cluster)
+      != 0
+    for: 15m
+    id: d859094c0a5ac6357cab4c776ccd5093
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

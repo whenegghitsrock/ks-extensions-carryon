@@ -1,0 +1,33 @@
+{{- if .Values.ksRbac.create }}
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRoleBinding
+metadata:
+  name: {{ template "extension.fullname" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: iam.kubesphere.io
+  kind: GlobalRole
+  name: {{ include "extension.fullname" . }}
+subjects:
+- apiGroup: kubesphere.io
+  kind: ServiceAccount
+  name: {{ include "extension.ksServiceAccountName" . }}
+  namespace: {{ include "extension.namespace" . }}
+---
+{{- end }}
+  
+apiVersion: iam.kubesphere.io/v1beta1
+kind: GlobalRoleBinding
+metadata:
+  name: {{ include "extension.fullname" . }}-anonymous
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: iam.kubesphere.io
+  kind: GlobalRole
+  name: {{ include "extension.fullname" . }}-anonymous
+subjects:
+  - apiGroup: iam.kubesphere.io
+    kind: Group
+    name: system:authenticated

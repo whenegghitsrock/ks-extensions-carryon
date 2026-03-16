@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: 0.1.2
+description: Frontend of gateway extension.
+home: https://kubesphere.io
+name: frontend
+sources:
+- https://github.com/kubesphere-extensions
+type: application
+version: 0.1.2

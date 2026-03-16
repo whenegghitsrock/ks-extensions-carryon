@@ -1,0 +1,45 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kubernetes-system-kube-proxy.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kubernetes-system-kube-proxy
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kubernetes-system-kube-proxy" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeProxyDown | default false) }}
+  - alert: KubeProxyDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: KubeProxy target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeproxydown
+      summary: Target is unreachable.
+    expr: up{job="kube-proxy"} == 0
+    for: 15m
+    id: 8c09dc1af831f0cb1050af7486c5c876
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

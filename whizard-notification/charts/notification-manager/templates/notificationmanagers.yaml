@@ -1,0 +1,60 @@
+apiVersion: notification.kubesphere.io/v2beta2
+kind: NotificationManager
+metadata:
+  labels:
+    app: notification-manager
+  name: notification-manager
+spec:
+  {{- if .Values.notificationmanager.replicas }}
+  replicas: {{ .Values.notificationmanager.replicas }}
+  {{- end}}
+  image: {{ include "global.imageRegistry" .}}{{ .Values.notificationmanager.image.repo }}:{{ .Values.notificationmanager.image.tag }}
+  imagePullPolicy: {{ .Values.notificationmanager.image.pullPolicy }}
+  serviceAccountName: notification-manager-sa
+  portName: webhook
+  nodeSelector:
+    {{- include "common.notificationmanager.nodeSelectors" . }}
+  affinity: 
+    {{- toYaml .Values.notificationmanager.affinity | nindent 4 }}
+  tolerations: 
+    {{- toYaml .Values.notificationmanager.tolerations | nindent 4 }}
+  resources: 
+    {{- toYaml .Values.notificationmanager.resources | nindent 4 }}
+  receivers: 
+    {{- toYaml .Values.notificationmanager.receivers | nindent 4 }}
+  defaultConfigSelector:
+    {{- toYaml .Values.notificationmanager.defaultConfigSelector | nindent 4 }}
+  volumeMounts:
+    {{- toYaml .Values.notificationmanager.volumeMounts | nindent 4 }}
+  volumes:
+    {{- toYaml .Values.notificationmanager.volumes | nindent 4 }}
+  defaultSecretNamespace:
+    {{- toYaml .Values.notificationmanager.defaultSecretNamespace | nindent 4 }}
+  {{- if .Values.kubesphere.enabled }}
+  sidecars:
+    tenant:
+  {{- if .Values.kubesphere.image }}
+      image: {{ include "global.imageRegistry" . }}{{ .Values.kubesphere.image }}
+  {{- else }}
+      image: {{ include "global.imageRegistry" . }}{{ .Values.notificationmanager.sidecar.image.repo }}:{{ .Values.kubesphere.version }}
+  {{- end }}
+      name: tenant
+      type: kubesphere
+      resources:
+        limits:
+          cpu: {{ .Values.notificationmanager.sidecar.tenant.resources.limits.cpu }}
+          memory: {{ .Values.notificationmanager.sidecar.tenant.resources.limits.memory }}
+        requests:
+          cpu: {{  .Values.notificationmanager.sidecar.tenant.resources.requests.cpu }}
+          memory: {{  .Values.notificationmanager.sidecar.tenant.resources.requests.memory }}
+  {{- end }}
+  template:
+    {{- toYaml .Values.notificationmanager.template | nindent 4 }}
+  groupLabels:
+    {{- toYaml .Values.notificationmanager.groupLabels | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.notificationmanager.annotations | nindent 4 }}
+  labels:
+    {{- toYaml .Values.notificationmanager.labels | nindent 4 }}
+  env:
+    {{- toYaml .Values.notificationmanager.env | nindent 4 }}

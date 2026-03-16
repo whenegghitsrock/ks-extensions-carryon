@@ -1,0 +1,75 @@
+#file: noinspection KubernetesUnknownValues
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "calico-exporter.fullname" . }}-ippool
+  labels: {{ include "calico-exporter.ippool-collector.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels: {{ include "calico-exporter.ippool-collector.selectorLabels" . | indent 8 }}
+  template:
+    metadata:
+      labels: {{ include "calico-exporter.ippool-collector.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: {{ template "calico-exporter.serviceAccountName" . }}
+{{- if .Values.securityContext }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
+{{- end }}
+      {{- with (include "calico-exporter.imagePullSecrets" .) }}
+      imagePullSecrets:
+        {{- . | nindent 6 }}
+      {{- end }}
+      containers:
+        - args:
+            - --logtostderr
+            - --secure-listen-address=0.0.0.0:{{ .Values.ippoolService.targetPort }}
+            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+            - --upstream=http://127.0.0.1:{{ .Values.ippoolService.innerPort }}/
+          image: '{{ include "calico-exporter.kubeRbacProxy.image" . }}'
+          imagePullPolicy: {{ .Values.kubeRbacProxy.image.pullPolicy }}
+          name: kube-rbac-proxy
+          ports:
+            - containerPort: {{ .Values.ippoolService.targetPort }}
+              name: https-metrics
+          resources:
+{{ toYaml .Values.kubeRbacProxy.resources | indent 12 }}
+          securityContext:
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+        - name: calico-exporter
+          env:
+            - name: NODENAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          image: '{{ include "calico-exporter.common.image" . }}'
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --web.listen-address=127.0.0.1:{{ .Values.ippoolService.innerPort }}
+            - --collector.enable-collectors=ippool
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          volumeMounts:
+            - name: var-run-calico
+              mountPath: /var/run/calico
+{{- if .Values.hostNetwork }}
+      hostNetwork: {{ .Values.hostNetwork }}
+{{- end }}
+{{- if .Values.affinity }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+{{- end }}
+      {{- with (include "calico-exporter.nodeSelector" .) }}
+      nodeSelector:
+        {{- . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+        - name: var-run-calico
+          hostPath:
+            path: /var/run/calico

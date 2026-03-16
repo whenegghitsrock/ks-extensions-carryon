@@ -1,0 +1,47 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.config-reloaders.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: config-reloaders
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "config-reloaders" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ConfigReloaderSidecarErrors | default false) }}
+  - alert: ConfigReloaderSidecarErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'Errors encountered while the {{`{{`}}$labels.pod{{`}}`}} config-reloader sidecar attempts to sync config in {{`{{`}}$labels.namespace{{`}}`}} namespace.
+
+        As a result, configuration for service running in {{`{{`}}$labels.pod{{`}}`}} may be stale and cannot be updated anymore.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/configreloadersidecarerrors
+      summary: config-reloader sidecar has not had a successful reload for 10m
+    expr: max_over_time(reloader_last_reload_successful{namespace=~".+"}[5m]) == 0
+    for: 10m
+    id: 39693c93edd5a4ce8b4f23d7de5024b3
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}
