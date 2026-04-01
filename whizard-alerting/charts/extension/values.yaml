@@ -1,0 +1,312 @@
+# Default values for whizard-alerting.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
+  imagePullSecrets: []
+
+fullnameOverride: ""
+namespaceOverride: ""
+
+kubeTargetVersionOverride: ""
+
+ # For kubernetes RBAC
+rbac:
+  create: true
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# For KubeSphere RBAC
+ksRbac:
+  create: true
+ksServiceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+crds:
+  update: false
+
+kubectl:
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/kubectl
+    tag: "v1.27.12"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
+
+replicaCount: 1
+podAnnotations: {}
+imagePullSecrets: []
+podSecurityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+apiserver:
+  reverseProxy:
+    # Specifies whether a ReverseProxy.extensions.kubesphere.io should be created
+    create: true
+  
+  securityContext: {}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/whizard-alerting-apiserver
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+    digest: ""
+  
+  # Effective when global.rules.distributionMode is Member
+  proxyRuler:
+    path: '/proxy/monitoring.coreos.com/v1/namespaces/{{ include "extension.namespace" . }}/thanosruler'
+  # Effective when rules.distributionMode is None
+  ruler: 
+    url: "http://query-whizard-operated.kubesphere-monitoring-system.svc:10902"
+
+controllerManager:
+  replicaCount: 1
+
+  securityContext: {}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/whizard-alerting-controller-manager
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+    digest: ""
+
+  args: []
+
+  extraVolumes: []
+  extraVolumeMounts: []
+
+## Enable builtin rule groups for alerting
+##
+builtinRules:
+
+  # Whether to manage builtin rules.
+  # Only when set it true, other config items can take effect.
+  managed: true
+
+  # Whether to enable builtin rules.
+  # When it is changed from true to false, all previously installed builtin rule groups will be uninstalled.
+  enabled: true
+
+  # Be careful to set it true because it will cause all rules to be reinstalled.
+  # Best to change back false After you set it true to trigger the reinstallation.
+  reset: false
+
+  # To configure specific builtin rule groups.
+  #
+  # Configure <group>.enabled to decide whether to enabled this rule group.
+  # When <group>.enabled is changed from true to false, this rule group will be uninstalled.
+  groups:
+    alertmanager-rules:
+      enabled: true
+    calico-exporter-rules:
+      enabled: true
+    config-reloaders:
+      enabled: true
+    etcd:
+      enabled: true
+    general-rules:
+      enabled: true
+    ks-apiserver:
+      enabled: true
+    ks-controller-manager:
+      enabled: true
+    kube-apiserver-slos:
+      enabled: true
+    kube-state-metrics:
+      enabled: true
+    kubernetes-apps:
+      enabled: true
+    kubernetes-resources:
+      enabled: true
+    kubernetes-storage:
+      enabled: true
+    kubernetes-system:
+      enabled: true
+    kubernetes-system-apiserver:
+      enabled: true
+    kubernetes-system-controller-manager:
+      enabled: true
+    kubernetes-system-kube-proxy:
+      enabled: true
+    kubernetes-system-kubelet:
+      enabled: true
+    kubernetes-system-scheduler:
+      enabled: true
+    kubesphere-system:
+      enabled: true
+    node-exporter:
+      enabled: true
+    node-network:
+      enabled: true
+    process-exporter-rules:
+      enabled: true
+    prometheus:
+      enabled: true
+    prometheus-operator:
+      enabled: true
+    thanos-bucket-replicate:
+      enabled: true
+    thanos-compact:
+      enabled: true
+    thanos-component-absent:
+      enabled: true
+    thanos-query:
+      enabled: true
+    thanos-receive:
+      enabled: true
+    thanos-rule:
+      enabled: true
+    thanos-sidecar:
+      enabled: true
+    thanos-store:
+      enabled: true
+
+  ## Reduce app namespace alert scope
+  appNamespacesTarget: ".*"
+
+  prometheusStackTarget:
+    namespace: "kubesphere-monitoring-system"
+
+  heritageNameOverride: true
+
+  ## Labels for default rules
+  labels: {}
+  ## Annotations for default rules
+  annotations: {}
+
+  ## Additional labels for PrometheusRule alerts
+  additionalRuleLabels: {}
+
+  ## Additional annotations for PrometheusRule alerts
+  additionalRuleAnnotations: {}
+
+  ## Prefix for runbook URLs. Use this to override the first part of the runbookURLs that is common to all rules.
+  runbookUrl: "https://alert-runbooks.kubesphere.io/latest/runbooks/"
+
+  ## Disabled PrometheusRule alerts
+  disabled:
+    PrometheusNotConnectedToAlertmanagers: true
+    PrometheusErrorSendingAlertsToAnyAlertmanager: true
+    PrometheusErrorSendingAlertsToSomeAlertmanagers: true
+  # KubeAPIDown: true
+  # NodeRAIDDegraded: true
+
+# Effective when rules.distributionMode is None
+ruler:
+  enabled: true
+
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/thanos
+    pullPolicy: IfNotPresent  
+    tag: v0.36.1
+    digest: ""
+  replicas: 1
+  imagePullSecrets: []
+  podSecurityContext: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+
+  configReloader:
+    image:
+      defaultRegistry: registry.cn-beijing.aliyuncs.com
+      registry: "registry.cn-beijing.aliyuncs.com"
+      repository: kubesphereon/prometheus-config-reloader
+      pullPolicy: IfNotPresent
+      tag: v0.75.1
+      digest: ""
+    resources: {}
+
+  writeProxy:
+    image:
+      registry: "registry.cn-beijing.aliyuncs.com"
+      repository: kubesphereon/cortex-tenant
+      pullPolicy: IfNotPresent
+      tag: v1.12.5
+      digest: ""
+    resources: {}
+
+  containers: []
+
+  logLevel: info # one of error, warn, info, debug
+  logFormat: logfmt # logfmt or json
+
+  ruleNamespaceSelector: {}
+  ruleSelector:
+    matchLabels:
+      alerting.kubesphere.io/data_source: default
+    
+  evaluationInterval: 1m
+
+  alertmanagersUrl:
+  - 'dnssrv+http://whizard-notification-alertmanager-headless.kubesphere-monitoring-system.svc:9093'
+
+  alertmanagers:
+  # - http_config:
+  #     basic_auth:
+  #     bearer_token: ""
+  #     tls_config: {}
+  #   scheme: http
+  #   static_configs:
+  #   - 'dnssrv+whizard-notification-alertmanager-headless.kubesphere-monitoring-system.svc:9093'
+
+  additionalArgs:
+  - name: alert.relabel-config
+    value:
+      - source_labels: ['alerttype','host_ip']
+        separator: ;
+        regex: '(metric);.*'
+        target_label: 'host_ip'
+        action: replace
+        replacement: $2
+
+  serviceMonitor:
+    additionalLabels:
+      app.kubernetes.io/vendor: kubesphere
+
+  shards: 1
+  
+  whizardService:
+    name: whizard
+    namespace: kubesphere-monitoring-system

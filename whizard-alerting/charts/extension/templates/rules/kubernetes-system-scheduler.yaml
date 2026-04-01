@@ -1,0 +1,45 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kubernetes-system-scheduler.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kubernetes-system-scheduler
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kubernetes-system-scheduler" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeSchedulerDown | default false) }}
+  - alert: KubeSchedulerDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: KubeScheduler target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeschedulerdown
+      summary: Target is unreachable.
+    expr: up{job="kube-scheduler"} == 0
+    for: 15m
+    id: f2c13f81fb2d40c8d34305bf4d60162f
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

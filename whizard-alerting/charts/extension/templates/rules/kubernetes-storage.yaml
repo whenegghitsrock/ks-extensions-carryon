@@ -1,0 +1,166 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kubernetes-storage.tmpl" }}
+
+{{- $targetNamespace := .Values.builtinRules.appNamespacesTarget }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kubernetes-storage
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kubernetes-storage" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubePersistentVolumeFillingUp | default false) }}
+  - alert: KubePersistentVolumeFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is only {{`{{`}} $value | humanizePercentage {{`}}`}} free.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubepersistentvolumefillingup
+      summary: PersistentVolume is filling up.
+    expr: |-
+      (
+        kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+          /
+        kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+      ) < 0.03
+      and
+      kubelet_volume_stats_used_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"} > 0
+      unless on(namespace, persistentvolumeclaim, cluster)
+      kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+      unless on(namespace, persistentvolumeclaim, cluster)
+      kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
+    for: 1m
+    id: 1401c9e1b119e95ccde46056e869caf9
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubePersistentVolumeFillingUp | default false) }}
+  - alert: KubePersistentVolumeFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is expected to fill up within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} is available.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubepersistentvolumefillingup
+      summary: PersistentVolume is filling up.
+    expr: |-
+      (
+        kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+          /
+        kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+      ) < 0.15
+      and
+      kubelet_volume_stats_used_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"} > 0
+      and
+      predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
+      unless on(namespace, persistentvolumeclaim, cluster)
+      kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+      unless on(namespace, persistentvolumeclaim, cluster)
+      kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
+    for: 1h
+    id: f4df94231db4ba454be67e3c7056314c
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubePersistentVolumeInodesFillingUp | default false) }}
+  - alert: KubePersistentVolumeInodesFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} only has {{`{{`}} $value | humanizePercentage {{`}}`}} free inodes.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubepersistentvolumeinodesfillingup
+      summary: PersistentVolumeInodes are filling up.
+    expr: |-
+      (
+        kubelet_volume_stats_inodes_free{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+          /
+        kubelet_volume_stats_inodes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+      ) < 0.03
+      and
+      kubelet_volume_stats_inodes_used{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"} > 0
+      unless on(namespace, persistentvolumeclaim)
+      kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+      unless on(namespace, persistentvolumeclaim)
+      kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
+    for: 1m
+    id: 51294ebb492341921e6d0df40e6fe981
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubePersistentVolumeInodesFillingUp | default false) }}
+  - alert: KubePersistentVolumeInodesFillingUp
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Based on recent sampling, the PersistentVolume claimed by {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in Namespace {{`{{`}} $labels.namespace {{`}}`}} is expected to run out of inodes within four days. Currently {{`{{`}} $value | humanizePercentage {{`}}`}} of its inodes are free.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubepersistentvolumeinodesfillingup
+      summary: PersistentVolumeInodes are filling up.
+    expr: |-
+      (
+        kubelet_volume_stats_inodes_free{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+          /
+        kubelet_volume_stats_inodes{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}
+      ) < 0.15
+      and
+      kubelet_volume_stats_inodes_used{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"} > 0
+      and
+      predict_linear(kubelet_volume_stats_inodes_free{job="kubelet", namespace=~"{{ $targetNamespace }}", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
+      unless on(namespace, persistentvolumeclaim)
+      kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+      unless on(namespace, persistentvolumeclaim)
+      kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
+    for: 1h
+    id: 3981cf959a90c5afbd7f7aa21377d3dd
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubePersistentVolumeErrors | default false) }}
+  - alert: KubePersistentVolumeErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The persistent volume {{`{{`}} $labels.persistentvolume {{`}}`}} has status {{`{{`}} $labels.phase {{`}}`}}.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubepersistentvolumeerrors
+      summary: PersistentVolume is having issues with provisioning.
+    expr: (kube_persistentvolume_status_phase{phase=~"Failed|Pending",job="kube-state-metrics"} > 0) * on(cluster, persistentvolume) group_left(pvc_namespace, pvc_name) label_replace(label_replace(label_replace(kube_persistentvolumeclaim_info{job="kube-state-metrics"}, "persistentvolume", "$1", "volumename", "(.*)"), "pvc_namespace", "$1", "namespace", "(.*)"), "pvc_name", "$1", "persistentvolumeclaim", "(.*)")
+    for: 5m
+    id: 10d15b499fb505b2913d458c9f59617a
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

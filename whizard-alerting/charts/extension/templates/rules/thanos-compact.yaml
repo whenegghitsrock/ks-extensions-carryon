@@ -1,0 +1,129 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.thanos-compact.tmpl" }}
+
+{{- $compactTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: thanos-compact
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "thanos-compact" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ThanosCompactMultipleRunning | default false) }}
+  - alert: ThanosCompactMultipleRunning
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: No more than one Thanos Compact instance should be running at once. There are {{`{{`}}$value{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} instances running.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanoscompactmultiplerunning
+      summary: Thanos Compact has multiple instances running.
+    expr: sum by (cluster, namespace, job) (up{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"}) > 1
+    for: 5m
+    id: b098b14c1f9c7179038289b21fa32a1b
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosCompactHalted | default false) }}
+  - alert: ThanosCompactHalted
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Compact {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has failed to run and now is halted.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanoscompacthalted
+      summary: Thanos Compact has failed to run and is now halted.
+    expr: thanos_compact_halted{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"} == 1
+    for: 5m
+    id: bdd26ccadf2423e163cf83e419b52f5d
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosCompactHighCompactionFailures | default false) }}
+  - alert: ThanosCompactHighCompactionFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Compact {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to execute {{`{{`}}$value | humanize{{`}}`}}% of compactions.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanoscompacthighcompactionfailures
+      summary: Thanos Compact is failing to execute compactions.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_compact_group_compactions_failures_total{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(thanos_compact_group_compactions_total{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"}[5m]))
+      * 100 > 5
+      )
+    for: 15m
+    id: 2dd7a48028afd46f3c50eefe57aa5ae4
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosCompactBucketHighOperationFailures | default false) }}
+  - alert: ThanosCompactBucketHighOperationFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Compact {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} Bucket is failing to execute {{`{{`}}$value | humanize{{`}}`}}% of operations.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanoscompactbuckethighoperationfailures
+      summary: Thanos Compact Bucket is having a high number of operation failures.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(thanos_objstore_bucket_operations_total{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"}[5m]))
+      * 100 > 5
+      )
+    for: 15m
+    id: 90dbbc17e6058573e6f8c0b7f365fb48
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosCompactHasNotRun | default false) }}
+  - alert: ThanosCompactHasNotRun
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Compact {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has not uploaded anything for 24 hours.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanoscompacthasnotrun
+      summary: Thanos Compact has not uploaded anything for last 24 hours.
+    expr: (time() - max by (cluster, namespace, job) (max_over_time(thanos_objstore_bucket_last_successful_upload_time{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"}[24h]))) / 60 / 60 > 24
+    id: aa125acd2fab4e586995fc4e490b95c8
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

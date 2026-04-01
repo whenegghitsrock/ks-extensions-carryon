@@ -1,0 +1,78 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.process-exporter-rules.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: process-exporter-rules
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "process-exporter-rules" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.NamedprocessGroupExistsZombieThreads | default false) }}
+  - alert: NamedprocessGroupExistsZombieThreads
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: The {{`{{`}} $labels.groupname {{`}}`}} process group on {{`{{`}} $labels.node {{`}}`}} node has {{`{{`}} $value {{`}}`}} zombie threads.
+      summary: The process group has zombie threads.
+    expr: sum by(cluster,node,groupname,instance,job) (namedprocess_namegroup_states{state="Zombie",job="process-exporter"}) > 0
+    for: 10m
+    id: 2de31c1a59b44587c39c3dd97392a468
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: error
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ProcessExporterDown | default false) }}
+  - alert: ProcessExporterDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: Process exporter target {{`{{`}} $labels.instance {{`}}`}} is down.
+      summary: Target is unreachable.
+    expr: up{job="process-exporter"} == 0
+    for: 10m
+    id: ec93e8da5ef948a37c252d0cc5b419d5
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ProcessScrapeErrors | default false) }}
+  - alert: ProcessScrapeErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: Process exporter {{`{{`}} $labels.instance {{`}}`}} has encountered {{`{{`}} $value {{`}}`}} scrape errors in the last 5 minutes.
+      summary: Process exporter has failed to scrape metrics.
+    expr: increase(namedprocess_scrape_errors{job="process-exporter"}[5m]) > 0
+    for: 15m
+    id: e8d287083058dcf02566c42d7ec569cc
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: error
+{{- end }}
+{{- end }}

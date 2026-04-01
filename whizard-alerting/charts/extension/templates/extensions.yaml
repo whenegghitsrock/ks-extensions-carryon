@@ -1,0 +1,21 @@
+{{- if .Values.apiserver.reverseProxy.create }}
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: ReverseProxy
+metadata:
+  name: {{ include "extension.fullname" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+spec:
+  directives:
+    authProxy: true
+    headerUp:
+    - -Authorization
+    stripPathPrefix: /proxy
+  matcher:
+    method: '*'
+    path: /proxy/alerting.kubesphere.io/v2beta1/*
+  upstream:
+    url: http://{{ include "extension.fullname" . }}.{{ include "extension.namespace" . }}.svc
+status:
+  state: Available
+{{- end }}

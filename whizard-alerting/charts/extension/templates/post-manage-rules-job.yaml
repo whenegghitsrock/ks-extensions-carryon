@@ -1,0 +1,95 @@
+{{- if .Values.builtinRules.managed }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "extension.fullname" . }}-builtin-rules
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    {{- include "extension.labels" $ | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  {{- range $_, $groupName := (fromYaml (include "rules.names" .)).rules }}
+  {{ $groupName }}.yaml: |
+    {{- include (printf "whizard-alerting.builtinRules.groups.%s.tmpl" $groupName) $ | nindent 4 }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "extension.fullname" . }}-builtin-rules-post-scripts
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+data:
+  {{- $cmds := list }}
+  {{- $reset := .Values.builtinRules.reset }}
+  {{- range $_, $groupName := (fromYaml (include "rules.names" .)).rules }}
+    {{- if $.Values.builtinRules.enabled }}
+      {{- $groupConfig := get $.Values.builtinRules.groups $groupName }}
+      {{- if $groupConfig }}
+        {{- if $groupConfig.enabled }}
+          {{- $cmd := printf "/bin/bash /scripts/apply-rulegroup.sh /builtin-rules/%s.yaml %t" $groupName $reset }}
+          {{- $cmds = append $cmds $cmd }}
+        {{- else }}
+          {{- $cmd := printf "kubectl delete globalrulegroups.alerting.kubesphere.io %s --ignore-not-found" $groupName }}
+          {{- $cmds = append $cmds $cmd }}
+        {{- end  }}
+      {{- end }}
+    {{- else }}
+      {{- $cmd := printf "kubectl delete globalrulegroups.alerting.kubesphere.io %s --ignore-not-found" $groupName }}
+      {{- $cmds = append $cmds $cmd }}
+    {{- end }}
+  {{- end }}
+  manage-rulegroups.sh: |
+    #!/usr/bin/env bash
+
+    set -e
+    {{- $cmds | join "\n" | nindent 4 }}
+{{ (.Files.Glob "scripts/apply-rulegroup.sh").AsConfig | indent 2 }}
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "extension.fullname" . }}-builtin-rules-post
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "extension.serviceAccountName" . }}
+      volumes:
+        - name: builtin-rules
+          configMap:
+            name: {{ include "extension.fullname" . }}-builtin-rules
+        - name: scripts
+          configMap:
+            name: {{ include "extension.fullname" . }}-builtin-rules-post-scripts
+      containers:
+        - name: post-install
+          image:  {{ template "extension.kubectl.image" . }}
+          command:
+            - /bin/bash
+            - /scripts/manage-rulegroups.sh
+          volumeMounts:
+            - mountPath: /builtin-rules
+              name: builtin-rules
+            - mountPath: /scripts
+              name: scripts
+          resources:
+            {{- toYaml .Values.kubectl.resources | nindent 12 }}
+{{- end }}

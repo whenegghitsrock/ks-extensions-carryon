@@ -1,5 +1,5 @@
 global:
-  imageRegistry: "dockerhub.kubekey.local"
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
 
 metricsServer:
@@ -9,7 +9,7 @@ metrics-server:
   fullnameOverride: "metrics-server"
 
   image:
-    registry: dockerhub.kubekey.local
+    registry: registry.cn-beijing.aliyuncs.com
     repository: kubesphereon/metrics-server
     tag: "v0.7.0"
 
@@ -28,6 +28,6 @@ metrics-server:
   addonResizer:
     enabled: false
     image:
-      registry: dockerhub.kubekey.local
+      registry: registry.cn-beijing.aliyuncs.com
       repository: kubesphereon/addon-resizer
       tag: 1.8.20

@@ -1,0 +1,101 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.general-rules.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: general-rules
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "general-rules" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.TargetDown | default false) }}
+  - alert: TargetDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} printf "%.4g" $value {{`}}`}}% of the {{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.service {{`}}`}} targets in {{`{{`}} $labels.namespace {{`}}`}} namespace are down.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/general/targetdown
+      summary: One or more targets are unreachable.
+    expr: 100 * (count(up == 0) BY (job, namespace, service, cluster) / count(up) BY (job, namespace, service, cluster)) > 10
+    for: 10m
+    id: 92cc619e8c5062c3d16f97b5f7cacee1
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.Watchdog | default false) }}
+  - alert: Watchdog
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'This is an alert meant to ensure that the entire alerting pipeline is functional.
+
+        This alert is always firing, therefore it should always be firing in Alertmanager
+
+        and always fire against a receiver. There are integrations with various notification
+
+        mechanisms that send a notification when this alert is not firing. For example the
+
+        "DeadMansSnitch" integration in PagerDuty.
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/general/watchdog
+      summary: An alert that should always be firing to certify that Alertmanager is working properly.
+    expr: vector(1)
+    id: d28ebaeafb76f69dc4481c95d4eeed2e
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: info
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.InfoInhibitor | default false) }}
+  - alert: InfoInhibitor
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: 'This is an alert that is used to inhibit info alerts.
+
+        By themselves, the info-level alerts are sometimes very noisy, but they are relevant when combined with
+
+        other alerts.
+
+        This alert fires whenever there''s a severity="info" alert, and stops firing when another alert with a
+
+        severity of ''warning'', ''error'' or ''critical'' starts firing on the same namespace.
+
+        This alert should be routed to a null receiver and configured to inhibit alerts with severity="info".
+
+        '
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/general/infoinhibitor
+      summary: Info-level alert inhibition.
+    expr: ALERTS{alertname != "InfoInhibitor", severity = "info", namespace != ""} == 1 unless on(namespace, cluster) ALERTS{alertname != "InfoInhibitor", severity =~ "warning|error|critical", alertstate="firing"} == 1
+    id: 717d031158115852491e4b1fd050ebba
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: info
+{{- end }}
+{{- end }}

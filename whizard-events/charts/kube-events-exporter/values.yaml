@@ -6,7 +6,7 @@ namespaceOverride: ""
 
 global:
   nodeSelector: {}
-  imageRegistry: "dockerhub.kubekey.local"
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
   clusterInfo: {}
 

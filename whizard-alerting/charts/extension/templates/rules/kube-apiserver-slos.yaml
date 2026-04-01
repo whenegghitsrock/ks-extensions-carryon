@@ -1,0 +1,119 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.kube-apiserver-slos.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: kube-apiserver-slos
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "kube-apiserver-slos" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
+  - alert: KubeAPIErrorBudgetBurn
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The API server is burning too much error budget.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeapierrorbudgetburn
+      summary: The API server is burning too much error budget.
+    expr: |-
+      sum by(cluster) (apiserver_request:burnrate1h) > (14.40 * 0.01000)
+      and
+      sum by(cluster) (apiserver_request:burnrate5m) > (14.40 * 0.01000)
+    for: 2m
+    id: 496dc38f79520016b294241cc24bad59
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+      long: 1h
+      short: 5m
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
+  - alert: KubeAPIErrorBudgetBurn
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The API server is burning too much error budget.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeapierrorbudgetburn
+      summary: The API server is burning too much error budget.
+    expr: |-
+      sum by(cluster) (apiserver_request:burnrate6h) > (6.00 * 0.01000)
+      and
+      sum by(cluster) (apiserver_request:burnrate30m) > (6.00 * 0.01000)
+    for: 15m
+    id: 496dc38f79520016b294241cc24bad59
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+      long: 6h
+      short: 30m
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
+  - alert: KubeAPIErrorBudgetBurn
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The API server is burning too much error budget.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeapierrorbudgetburn
+      summary: The API server is burning too much error budget.
+    expr: |-
+      sum by(cluster) (apiserver_request:burnrate1d) > (3.00 * 0.01000)
+      and
+      sum by(cluster) (apiserver_request:burnrate2h) > (3.00 * 0.01000)
+    for: 1h
+    id: d91e8041b76c5861056ae6a61dabd8d7
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+      long: 1d
+      short: 2h
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.KubeAPIErrorBudgetBurn | default false) }}
+  - alert: KubeAPIErrorBudgetBurn
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: The API server is burning too much error budget.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubernetes/kubeapierrorbudgetburn
+      summary: The API server is burning too much error budget.
+    expr: |-
+      sum by(cluster) (apiserver_request:burnrate3d) > (1.00 * 0.01000)
+      and
+      sum by(cluster) (apiserver_request:burnrate6h) > (1.00 * 0.01000)
+    for: 3h
+    id: d91e8041b76c5861056ae6a61dabd8d7
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+      long: 3d
+      short: 6h
+    severity: warning
+{{- end }}
+{{- end }}

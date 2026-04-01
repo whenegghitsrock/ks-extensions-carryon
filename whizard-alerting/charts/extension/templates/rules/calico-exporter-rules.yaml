@@ -1,0 +1,94 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.calico-exporter-rules.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: calico-exporter-rules
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "calico-exporter-rules" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.CalicoBGPBirdDown | default false) }}
+  - alert: CalicoBGPBirdDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Calico BGP bird {{`{{`}} $labels.instance {{`}}`}} ({{`{{`}} $labels.router_id {{`}}`}}) is down.
+      summary: Calico BGP bird is down.
+    expr: calico_bgp_bird_info{up="false"} == 1
+    for: 5m
+    id: 76700fc486f32b0aaa64f7ac8122edf0
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.CalicoBirdLastRebootTimestampChanged | default false) }}
+  - alert: CalicoBirdLastRebootTimestampChanged
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Calico BGP bird {{`{{`}} $labels.instance {{`}}`}} ({{`{{`}} $labels.router_id {{`}}`}}) last reboot timestamp has changed.
+      summary: Calico BGP bird last reboot timestamp has changed.
+    expr: delta(calico_bgp_bird_last_reboot_timestamp_seconds[5m]) > 5
+    id: b6f4043460f703c4c343c0a602134b52
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.CalicoBGPPeerStateAbnormal | default false) }}
+  - alert: CalicoBGPPeerStateAbnormal
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Calico BGP peer {{`{{`}} $labels.name {{`}}`}} ({{`{{`}} $labels.ip {{`}}`}}) is not in established state.
+      summary: Calico BGP peer connection state is abnormal.
+    expr: calico_bgp_peer_info{conn_state!="Established"} == 1
+    for: 5m
+    id: 5929aa6dfb3e1397de5087cb85b6f3fd
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.CalicoIPPoolUsageHigh | default false) }}
+  - alert: CalicoIPPoolUsageHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Calico IP pool {{`{{`}} $labels.name {{`}}`}} ({{`{{`}} $labels.cidr {{`}}`}}) has {{`{{`}} $value | humanizePercentage {{`}}`}} of IPs allocated.
+      summary: Calico IP pool usage is high.
+    expr: calico_ippool_allocated_ips / calico_ippool_capacity >= 0.9
+    for: 5m
+    id: 858af260dab7d5a699be2e5c84d9e513
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

@@ -3,7 +3,7 @@ namespaceOverride: ""
 imageRegistryOverride: ""
 
 global:
-  imageRegistry: "dockerhub.kubekey.local"
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
   imagePullSecrets: []
   nodeSelector: {}
 

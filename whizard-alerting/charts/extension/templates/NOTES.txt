@@ -1,0 +1,2 @@
+1. Get the application URL by running these commands:
+  kubectl -n {{ include "extension.namespace" . }} get pods -l "app.kubernetes.io/instance in ({{ include "extension.fullname" . }})"

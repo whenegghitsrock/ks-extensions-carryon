@@ -1,0 +1,211 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.thanos-query.tmpl" }}
+
+{{- $queryTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: thanos-query
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "thanos-query" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ThanosQueryHttpRequestQueryErrorRateHigh | default false) }}
+  - alert: ThanosQueryHttpRequestQueryErrorRateHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to handle {{`{{`}}$value | humanize{{`}}`}}% of "query" requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryhttprequestqueryerrorratehigh
+      summary: Thanos Query is failing to handle requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(http_requests_total{code=~"5..", job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(http_requests_total{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query"}[5m]))
+      ) * 100 > 5
+    for: 5m
+    id: b55089e4fac9fd4b73cf4c84a1cf56b6
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryHttpRequestQueryRangeErrorRateHigh | default false) }}
+  - alert: ThanosQueryHttpRequestQueryRangeErrorRateHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to handle {{`{{`}}$value | humanize{{`}}`}}% of "query_range" requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryhttprequestqueryrangeerrorratehigh
+      summary: Thanos Query is failing to handle requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(http_requests_total{code=~"5..", job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query_range"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(http_requests_total{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query_range"}[5m]))
+      ) * 100 > 5
+    for: 5m
+    id: 06f95a1aa45c8e811706adc967ea43a8
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryGrpcServerErrorRate | default false) }}
+  - alert: ThanosQueryGrpcServerErrorRate
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to handle {{`{{`}}$value | humanize{{`}}`}}% of requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosquerygrpcservererrorrate
+      summary: Thanos Query is failing to handle requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded", job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(grpc_server_started_total{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"}[5m]))
+      * 100 > 5
+      )
+    for: 5m
+    id: 8169fe30971048a2ec9a14455b7279e3
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryGrpcClientErrorRate | default false) }}
+  - alert: ThanosQueryGrpcClientErrorRate
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to send {{`{{`}}$value | humanize{{`}}`}}% of requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosquerygrpcclienterrorrate
+      summary: Thanos Query is failing to send requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(grpc_client_handled_total{grpc_code!="OK", job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(grpc_client_started_total{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"}[5m]))
+      ) * 100 > 5
+    for: 5m
+    id: 0ea1cc7972a46e955b20f0c508cadf8b
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryHighDNSFailures | default false) }}
+  - alert: ThanosQueryHighDNSFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} have {{`{{`}}$value | humanize{{`}}`}}% of failing DNS queries for store endpoints.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryhighdnsfailures
+      summary: Thanos Query is having high number of DNS failures.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_query_store_apis_dns_failures_total{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(thanos_query_store_apis_dns_lookups_total{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"}[5m]))
+      ) * 100 > 1
+    for: 15m
+    id: 25b6a25e3306c92c20f28a1bc31ae22d
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryInstantLatencyHigh | default false) }}
+  - alert: ThanosQueryInstantLatencyHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has a 99th percentile latency of {{`{{`}}$value{{`}}`}} seconds for instant queries.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryinstantlatencyhigh
+      summary: Thanos Query has high latency for queries.
+    expr: |-
+      (
+        histogram_quantile(0.99, sum by (cluster, namespace, job, le) (rate(http_request_duration_seconds_bucket{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query"}[5m]))) > 40
+      and
+        sum by (cluster, namespace, job) (rate(http_request_duration_seconds_bucket{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query"}[5m])) > 0
+      )
+    for: 10m
+    id: a7ccee14aff0c569a76556285d888f62
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryRangeLatencyHigh | default false) }}
+  - alert: ThanosQueryRangeLatencyHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has a 99th percentile latency of {{`{{`}}$value{{`}}`}} seconds for range queries.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryrangelatencyhigh
+      summary: Thanos Query has high latency for queries.
+    expr: |-
+      (
+        histogram_quantile(0.99, sum by (cluster, namespace, job, le) (rate(http_request_duration_seconds_bucket{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query_range"}[5m]))) > 90
+      and
+        sum by (cluster, namespace, job) (rate(http_request_duration_seconds_count{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}", handler="query_range"}[5m])) > 0
+      )
+    for: 10m
+    id: 4ab7bbef654924c6b023ffcd1c5fbc1a
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryOverload | default false) }}
+  - alert: ThanosQueryOverload
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Query {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has been overloaded for more than 15 minutes. This may be a symptom of excessive simultanous complex requests, low performance of the Prometheus API, or failures within these components. Assess the health of the Thanos query instances, the connnected Prometheus instances, look for potential senders of these requests and then contact support.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryoverload
+      summary: Thanos query reaches its maximum capacity serving concurrent requests.
+    expr: |-
+      (
+        max_over_time(thanos_query_concurrent_gate_queries_max[5m]) - avg_over_time(thanos_query_concurrent_gate_queries_in_flight[5m]) < 1
+      )
+    for: 15m
+    id: 01cdbecb009585e20967c209affd18c1
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

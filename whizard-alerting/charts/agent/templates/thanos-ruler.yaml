@@ -1,0 +1,182 @@
+{{- if .Values.ruler.enabled }}
+{{- if eq (include "agent.distributionMode" .) "Member" }}
+apiVersion: monitoring.coreos.com/v1
+kind: ThanosRuler
+metadata:
+  name: {{ include "agent.fullname" . }}
+  namespace: {{ include "agent.namespace" . }}
+  labels:
+    {{- include "agent.labels" . | nindent 4 }}
+spec:
+  image: {{ include "agent.ruler.image" . }}
+  imagePullPolicy: {{ .Values.ruler.image.pullPolicy }}
+  replicas: {{ .Values.ruler.replicas }}
+  {{- with (include "agent.ruler.imagePullSecrets" .) }}
+  imagePullSecrets:
+    {{- . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.ruler.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ruler.podSecurityContext }}
+  securityContext:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with (include "agent.ruler.nodeSelector" .) }}
+  nodeSelector:
+    {{- . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ruler.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ruler.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  logLevel: {{ .Values.ruler.logLevel }}
+  logFormat: {{ .Values.ruler.logFormat }}
+
+  evaluationInterval: '{{ .Values.ruler.evaluationInterval }}'
+  labels:
+    {{- with .Values.global.clusterInfo.name }}
+    cluster: {{ . }}
+    {{- end }}
+
+  {{- if eq (kindOf .Values.ruler.ruleNamespaceSelector) "map" }}
+  ruleNamespaceSelector:
+    {{- toYaml .Values.ruler.ruleNamespaceSelector | nindent 4 }}
+  {{- end }}
+  {{- $ruleSelector := .Values.ruler.ruleSelector }}
+  {{- if eq (kindOf $ruleSelector) "map" }}
+  ruleSelector:
+    matchLabels:
+    {{- if .Values.global.clusterInfo.name }}
+      alerting.kubesphere.io/owner_cluster: {{ .Values.global.clusterInfo.name }}
+    {{- end }}
+    {{- if eq (kindOf $ruleSelector.matchLabels) "map" }}
+      {{- toYaml $ruleSelector.matchLabels | nindent 6 }}
+    {{- end }}
+    matchExpressions:
+      - key: alerting.kubesphere.io/rule_level
+        operator: NotIn
+        values:
+        - global
+      {{- if $ruleSelector.matchExpressions }}
+      {{- toYaml $ruleSelector.matchExpressions | nindent 6 }}
+      {{- end }}
+  {{- end }}
+
+  {{- if .Values.ruler.queryEndpoints }}
+  queryEndpoints:
+  {{- tpl (toYaml .Values.ruler.queryEndpoints | nindent 4) . }}
+  {{- end }}
+
+  {{- with .Values.ruler.alertmanagersUrl }}
+  alertmanagersUrl:
+    {{ toYaml . }}
+  {{- end }}
+
+  additionalArgs:
+  {{- if .Values.ruler.remoteWriteConfig }}
+  - name: remote-write.config
+    value: |
+      {{- toYaml .Values.ruler.remoteWriteConfig  | nindent 6 }}
+  {{- else }}
+  {{- $remoteWriteConfig := include "agent.ruler.remoteWriteConfig" . -}}
+  {{- if $remoteWriteConfig }}
+  - name: remote-write.config
+    value: |
+      {{- include "agent.ruler.remoteWriteConfig" . | nindent 6 }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.ruler.alertmanagers }}
+  - name: alertmanagers.config
+    value: |
+      {{- toYaml .Values.ruler.alertmanagers | nindent 6 }}
+  {{- end }}
+  {{- range .Values.ruler.additionalArgs }}
+  - name: {{ .name }}
+  {{- if .value }}
+    value: |
+      {{- toYaml .value | nindent 6 }}
+  {{- end }}
+  {{- end }}
+
+  {{- $reloaderContainer := include "agent.ruler.configReloader.container" $ | fromYaml }}
+  {{- $containers := list }}
+  {{- range $_, $container := .Values.ruler.containers }}
+    {{- if eq $container.name "config-reloader" }}
+      {{- $reloaderContainer = mergeOverwrite $reloaderContainer $container }}
+    {{- else }}
+      {{- $containers = append $containers $container }}
+    {{- end }}
+  {{- end }}
+  {{- $containers = append $containers $reloaderContainer }}
+
+  {{- with $containers }}
+  containers:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+---
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "agent.fullname" . }}-ruler
+  namespace: {{ include "agent.namespace" . }}
+  labels:
+    {{- include "agent.labels" . | nindent 4 }}
+    {{- with .Values.ruler.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      operated-thanos-ruler: "true"
+  namespaceSelector:
+    matchNames:
+      - {{ printf "%s" (include "agent.namespace" .) | quote }}
+  endpoints:
+  - port: web
+    {{- if .Values.ruler.serviceMonitor.interval }}
+    interval: {{ .Values.ruler.serviceMonitor.interval }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.scheme }}
+    scheme: {{ .Values.ruler.serviceMonitor.scheme }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.bearerTokenFile }}
+    bearerTokenFile: {{ .Values.ruler.serviceMonitor.bearerTokenFile }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.tlsConfig }}
+    tlsConfig: {{- toYaml .Values.ruler.serviceMonitor.tlsConfig | nindent 6 }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.metricRelabelings }}
+    metricRelabelings: {{- tpl (toYaml .Values.ruler.serviceMonitor.metricRelabelings | nindent 6) . }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.relabelings }}
+    relabelings: {{- toYaml .Values.ruler.serviceMonitor.relabelings | nindent 6 }}
+    {{- end }}
+
+---
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: ReverseProxy
+metadata:
+  name: {{ include "agent.fullname" . }}-ruler
+spec:
+  directives:
+    headerUp:
+    - -Authorization
+    stripPathPrefix: /proxy/monitoring.coreos.com/v1/namespaces/{{ include "agent.namespace" . }}/thanosruler
+  matcher:
+    method: '*'
+    path: '/proxy/monitoring.coreos.com/v1/namespaces/{{ include "agent.namespace" . }}/thanosruler/*'
+  upstream:
+    url: http://thanos-ruler-operated.{{ include "agent.namespace" . }}.svc:10902
+status:
+  state: Available
+{{- end }}
+{{- end }}

@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "extension.fullname" . }}
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "extension.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        kubesphere.io/serviceaccount-name: {{ include "extension.ksServiceAccountName" . }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "extension.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "extension.serviceAccountName" . }}
+      {{- with (include "extension.imagePullSecrets" .) }}
+      imagePullSecrets:
+        {{- . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (include "extension.nodeSelector" .) }}
+      nodeSelector:
+        {{- . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: apiserver
+        securityContext:
+          {{- toYaml .Values.apiserver.securityContext | nindent 12 }}
+        image: '{{ include "extension.apiserver.image" . }}'
+        imagePullPolicy: {{ .Values.apiserver.image.pullPolicy }}
+        args:
+        - --http-address=[$(POD_IP)]:9090
+        - --resource.storage-namespace=$(NAMESPACE)
+        - --resource.distribution-mode={{ include "extension.distributionMode" . }}
+        {{- if eq (include "extension.distributionMode" .) "None" }}
+        - --ruler.url={{ .Values.apiserver.ruler.url }}
+        {{- else }}
+        - --proxy-ruler.path={{ tpl .Values.apiserver.proxyRuler.path . }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.apiserver.resources | nindent 12 }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        {{- with .Values.apiserver.extraVolumeMounts }}
+        volumeMounts:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      - name: controller-manager
+        securityContext:
+          {{- toYaml .Values.controllerManager.securityContext | nindent 12 }}
+        image: '{{ include "extension.controllerManager.image" . }}'
+        imagePullPolicy: {{ .Values.controllerManager.image.pullPolicy }}
+        args:
+        - --resource.storage-namespace=$(NAMESPACE)
+        - --resource.distribution-mode={{ include "extension.distributionMode" . }}
+        - --leader-elect=true
+        {{- with .Values.controllerManager.args }}
+        {{- toYaml . | nindent 8}}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+        resources:
+          {{- toYaml .Values.controllerManager.resources | nindent 12 }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: webhook-secret
+        {{- with .Values.controllerManager.extraVolumeMounts }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      volumes:
+      - name: webhook-secret
+        secret:
+          defaultMode: 420
+          secretName: {{ include "extension.fullname" . }}-webhook-cert
+{{- if .Values.extraVolumes }}
+{{ toYaml .Values.extraVolumes | indent 6 }}
+{{- end }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "extension.fullname" . }}
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: apiserver
+    port: 80
+    protocol: TCP
+    targetPort: 9090
+  - name: controller-manager
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    {{- include "extension.selectorLabels" . | nindent 4 }}
+  sessionAffinity: None
+  type: ClusterIP

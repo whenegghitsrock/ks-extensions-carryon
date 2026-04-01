@@ -1,0 +1,303 @@
+{{- $categoryGlobal := printf "%s-global-alerting" (include "agent.fullname" .) }}
+{{- $categoryCluster := printf "%s-cluster-alerting" (include "agent.fullname" .) }}
+{{- $categoryNamespace := printf "%s-namespace-alerting" (include "agent.fullname" .) }}
+
+{{- $roleTemplateGlobalViewRuleGroups := printf "%s-global-view-rulegroups" (include "agent.fullname" .) }}
+{{- $roleTemplateGlobalManageRuleGroups := printf "%s-global-manage-rulegroups" (include "agent.fullname" .) }}
+{{- $roleTemplateGlobalViewAlerts := printf "%s-global-view-alerts" (include "agent.fullname" .) }}
+
+{{- $roleTemplateClusterViewRuleGroups := printf "%s-cluster-view-rulegroups" (include "agent.fullname" .) }}
+{{- $roleTemplateClusterManageRuleGroups := printf "%s-cluster-manage-rulegroups" (include "agent.fullname" .) }}
+{{- $roleTemplateClusterViewAlerts := printf "%s-cluster-view-alerts" (include "agent.fullname" .) }}
+
+{{- $roleTemplateNamespaceViewRuleGroups := printf "%s-namespace-view-rulegroups" (include "agent.fullname" .) }}
+{{- $roleTemplateNamespaceManageRuleGroups := printf "%s-namespace-manage-rulegroups" (include "agent.fullname" .) }}
+{{- $roleTemplateNamespaceViewAlerts := printf "%s-namespace-view-alerts" (include "agent.fullname" .) }}
+
+{{- if eq .Values.global.clusterInfo.role "host" }}
+# role templates of global rule groups is as follows
+apiVersion: iam.kubesphere.io/v1beta1
+kind: Category
+metadata:
+  name: {{ $categoryGlobal }}
+  labels:
+    iam.kubesphere.io/scope: global
+    kubesphere.io/managed: 'true'
+spec:
+  displayName:
+    en: Alerting
+    zh: 告警
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"globalrulegroups": "view"}'
+  labels:
+    iam.kubesphere.io/aggregate-to-viewer: ""
+    iam.kubesphere.io/category: {{ $categoryGlobal }}
+    iam.kubesphere.io/scope: global
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateGlobalViewRuleGroups }}
+spec:
+  description:
+    en: View global-level rule groups.
+    zh: 查看平台层级的规则组。
+  displayName:
+    en: Rule Group Viewing
+    zh: 规则组查看
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - globalrulegroups
+    verbs:
+    - get
+    - list 
+    - watch
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"globalrulegroups": "manage"}'
+    iam.kubesphere.io/dependencies: '["{{ $roleTemplateGlobalViewRuleGroups }}"]'
+  labels:
+    iam.kubesphere.io/category: {{ $categoryGlobal }}
+    iam.kubesphere.io/scope: global
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateGlobalManageRuleGroups }}
+spec:
+  description:
+    en: Create, edit, and delete global-level rule groups.
+    zh: 创建、编辑和删除平台层级的规则组。
+  displayName:
+    en: Rule Group Management
+    zh: 规则组管理
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - globalrulegroups
+    verbs:
+    - '*'
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"globalalerts": "view"}'
+  labels:
+    iam.kubesphere.io/aggregate-to-viewer: ""
+    iam.kubesphere.io/category: {{ $categoryGlobal }}
+    iam.kubesphere.io/scope: global
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateGlobalViewAlerts }}
+spec:
+  description:
+    en: View alerts trigged by global-level rule groups.
+    zh: 查看平台层级规则组所触发的告警。
+  displayName:
+    en: Alert Viewing
+    zh: 告警查看
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - globalalerts
+    verbs:
+    - '*'
+---
+{{- end }}
+
+# role templates of cluster rule groups is as follows
+
+apiVersion: iam.kubesphere.io/v1beta1
+kind: Category
+metadata:
+  name: {{ $categoryCluster }}
+  labels:
+    iam.kubesphere.io/scope: cluster
+    kubesphere.io/managed: 'true'
+spec:
+  displayName:
+    en: Alerting
+    zh: 告警
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"clusterrulegroups": "view"}'
+  labels:
+    iam.kubesphere.io/aggregate-to-cluster-viewer: ""
+    iam.kubesphere.io/category: {{ $categoryCluster }}
+    iam.kubesphere.io/scope: cluster
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateClusterViewRuleGroups }}
+spec:
+  description:
+    en: View cluster-level rule groups.
+    zh: 查看集群层级的规则组。
+  displayName:
+    en: Rule Group Viewing
+    zh: 规则组查看
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - clusterrulegroups
+    verbs:
+    - get
+    - list 
+    - watch
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"clusterrulegroups": "manage"}'
+    iam.kubesphere.io/dependencies: '["{{ $roleTemplateClusterViewRuleGroups }}"]'
+  labels:
+    iam.kubesphere.io/category: {{ $categoryCluster }}
+    iam.kubesphere.io/scope: cluster
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateClusterManageRuleGroups }}
+spec:
+  description:
+    en: Create, edit, and delete cluster-level rule groups.
+    zh: 创建、编辑和删除集群层级的规则组。
+  displayName:
+    en: Rule Group Management
+    zh: 规则组管理
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - clusterrulegroups
+    verbs:
+    - '*'
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"clusteralerts": "view"}'
+  labels:
+    iam.kubesphere.io/aggregate-to-cluster-viewer: ""
+    iam.kubesphere.io/category: {{ $categoryCluster }}
+    iam.kubesphere.io/scope: cluster
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateClusterViewAlerts }}
+spec:
+  description:
+    en: View alerts trigged by cluster-level rule groups.
+    zh: 查看集群层级规则组触发的告警。
+  displayName:
+    en: Alert Viewing
+    zh: 告警查看
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - clusteralerts
+    verbs:
+    - '*'
+---
+
+# role templates of namespace rule groups is as follows
+
+apiVersion: iam.kubesphere.io/v1beta1
+kind: Category
+metadata:
+  name: {{ $categoryNamespace }}
+  labels:
+    iam.kubesphere.io/scope: namespace
+    kubesphere.io/managed: 'true'  
+spec:
+  displayName:
+    en: Alerting
+    zh: 告警
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"rulegroups": "view"}'
+  labels:
+    iam.kubesphere.io/aggregate-to-operator: ""
+    iam.kubesphere.io/aggregate-to-viewer: ""
+    iam.kubesphere.io/category: {{ $categoryNamespace }}
+    iam.kubesphere.io/scope: namespace
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateNamespaceViewRuleGroups }}
+spec:
+  description:
+    en: View rule groups in the project.
+    zh: 查看项目中的规则组。
+  displayName:
+    en: Rule Group Viewing
+    zh: 规则组查看
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - rulegroups
+    verbs:
+    - get
+    - list 
+    - watch
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"rulegroups": "manage"}'
+    iam.kubesphere.io/dependencies: '["{{ $roleTemplateNamespaceViewRuleGroups }}"]'
+  labels:
+    iam.kubesphere.io/aggregate-to-operator: ""
+    iam.kubesphere.io/category: {{ $categoryNamespace }}
+    iam.kubesphere.io/scope: namespace
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateNamespaceManageRuleGroups }}
+spec:
+  description:
+    en: Create, edit, and delete rule groups in the project.
+    zh: 创建、编辑和删除项目中的规则组。
+  displayName:
+    en: Rule Group Management
+    zh: 规则组管理
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - rulegroups
+    verbs:
+    - '*'
+---
+apiVersion: iam.kubesphere.io/v1beta1
+kind: RoleTemplate
+metadata:
+  annotations:
+    iam.kubesphere.io/role-template-rules: '{"alerts": "view"}'
+  labels:
+    iam.kubesphere.io/aggregate-to-operator: ""
+    iam.kubesphere.io/aggregate-to-viewer: ""
+    iam.kubesphere.io/category: {{ $categoryNamespace }}
+    iam.kubesphere.io/scope: namespace
+    kubesphere.io/managed: "true"
+  name: {{ $roleTemplateNamespaceViewAlerts }}
+spec:
+  description:
+    en: View alerts in the project.
+    zh: 查看项目中的告警。
+  displayName:
+    en: Alert Viewing
+    zh: 告警查看
+  rules:
+  - apiGroups:
+    - 'alerting.kubesphere.io'
+    resources:
+    - alerts
+    verbs:
+    - '*'

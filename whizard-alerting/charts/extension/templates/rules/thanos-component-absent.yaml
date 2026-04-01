@@ -1,0 +1,141 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.thanos-component-absent.tmpl" }}
+
+{{- $ruleTargetNamespace := printf "%s|%s" .Values.builtinRules.prometheusStackTarget.namespace (include "extension.namespace" .) }}
+{{- $queryTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+{{- $receiveTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+{{- $storeTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+{{- $compactTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+{{- $sidecarTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: thanos-component-absent
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "thanos-component-absent" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ThanosCompactIsDown | default false) }}
+  - alert: ThanosCompactIsDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ThanosCompact target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanoscompactisdown
+      summary: Target is unreachable.
+    expr: up{job=~".*(thanos-compact|compactor-whizard).*", namespace="{{ $compactTargetNamespace }}"} == 0
+    for: 5m
+    id: 6b24578e56ce9147908969657bad3139
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosQueryIsDown | default false) }}
+  - alert: ThanosQueryIsDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ThanosQuery target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosqueryisdown
+      summary: Target is unreachable.
+    expr: up{job=~".*(thanos-query|query-whizard).*", namespace="{{ $queryTargetNamespace }}"} == 0
+    for: 5m
+    id: 7a752db83872d648f49b40e5abf736bb
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosReceiveIsDown | default false) }}
+  - alert: ThanosReceiveIsDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ThanosReceive target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosreceiveisdown
+      summary: Target is unreachable.
+    expr: up{job=~".*(thanos-receive|(router|ingester)-whizard).*", namespace="{{ $receiveTargetNamespace }}"} == 0
+    for: 5m
+    id: 4d1ee599c1bc7a884f24edfbb6f31dbd
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosRuleIsDown | default false) }}
+  - alert: ThanosRuleIsDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ThanosRule target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosruleisdown
+      summary: Target is unreachable.
+    expr: up{job=~".*(thanos-rule|ruler-whizard).*", namespace=~"{{ $ruleTargetNamespace }}"} == 0
+    for: 5m
+    id: 97c3502b687da6afbf52e3fdf43d930b
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosSidecarIsDown | default false) }}
+  - alert: ThanosSidecarIsDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ThanosSidecar target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanossidecarisdown
+      summary: Target is unreachable.
+    expr: up{job=~".*(thanos-sidecar|sidecar-whizard).*", namespace="{{ $sidecarTargetNamespace }}"} == 0
+    for: 5m
+    id: 032cc0d8832a62343ec31808910cef33
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosStoreIsDown | default false) }}
+  - alert: ThanosStoreIsDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ThanosStore target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosstoreisdown
+      summary: Target is unreachable.
+    expr: up{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"} == 0
+    for: 5m
+    id: 7f24451ff0bec6bb3c5e72c9c0f8f6db
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

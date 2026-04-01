@@ -1,0 +1,63 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.ks-apiserver.tmpl" }}
+
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: ks-apiserver
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "ks-apiserver" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ksApiSlow | default false) }}
+  - alert: ksApiSlow
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      message: 99th percentile of requests is {{`{{`}} $value {{`}}`}}s on ks-apiserver instance {{`{{`}} $labels.instance {{`}}`}} for {{`{{`}} $labels.verb {{`}}`}} {{`{{`}} $labels.resource {{`}}`}}.{{`{{`}} $labels.group {{`}}`}}/{{`{{`}} $labels.version {{`}}`}}
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/ksapislow
+      summary: ks-apiserver requests are slow.
+    expr: histogram_quantile(0.99, sum by(instance,group,resource,verb,version,le,cluster) (rate(ks_server_request_duration_seconds_bucket{group!="terminal.kubesphere.io", job="ks-apiserver"}[5m]))) > 5
+    for: 10m
+    id: 3f5d58fdbd68199d4ff515bfd09a2f87
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ksApiserverDown | default false) }}
+  - alert: ksApiserverDown
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: ksApiserver target instance {{`{{`}} $labels.instance {{`}}`}} is down.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/kubesphere/ksapiserverdown
+      summary: Target is unreachable.
+    expr: up{job="ks-apiserver"} == 0
+    for: 15m
+    id: 766f549cf2737e1adc0c62e4f5fd0ba6
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: critical
+{{- end }}
+{{- end }}

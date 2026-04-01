@@ -1,0 +1,123 @@
+# Default values for whizard-alerting.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+fullnameOverride: ""
+namespaceOverride: ""
+
+global:
+  imageRegistry: "registry.cn-beijing.aliyuncs.com"
+  imagePullSecrets: []
+  rules:
+    # None for env with enabled whizard
+    # Member for env with disabled whizard
+    distributionMode: Member
+  clusterInfo:
+    role: ""
+    name: ""
+
+crds:
+  update: false
+
+kubectl:
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/kubectl
+    tag: "v1.27.12"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
+
+# ruler statefulset config
+ruler:
+  enabled: true
+
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/thanos
+    pullPolicy: IfNotPresent
+    tag: v0.36.1
+    digest: ""
+
+  replicas: 1
+  imagePullSecrets: []
+  podSecurityContext: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  resources: {}
+
+  # configReloader config to set the container in charge of reloading changed config into ruler container.
+  configReloader:
+    image:
+      defaultRegistry: registry.cn-beijing.aliyuncs.com
+      registry: "registry.cn-beijing.aliyuncs.com"
+      repository: kubesphereon/prometheus-config-reloader
+      pullPolicy: IfNotPresent
+      tag: v0.75.1
+      digest: ""
+    resources: {}
+
+  containers: []
+
+  logLevel: info # one of error, warn, info, debug
+  logFormat: logfmt # logfmt or json
+
+  ruleNamespaceSelector: {}
+  ruleSelector:
+    matchLabels:
+      alerting.kubesphere.io/data_source: default
+    
+  evaluationInterval: 1m
+
+  alertmanagersUrl:
+  - dnssrv+http://whizard-notification-alertmanager-headless.kubesphere-monitoring-system.svc:9093
+
+  alertmanagers:
+  # - http_config:
+  #     basic_auth:
+  #     bearer_token: ""
+  #     tls_config: {}
+  #   scheme: http
+  #   static_configs:
+  #   - 'dnssrv+whizard-notification-alertmanager-headless.kubesphere-monitoring-system.svc:9093'
+
+  additionalArgs:
+  - name: alert.relabel-config
+    value:
+      - source_labels: ['alerttype','host_ip']
+        separator: ;
+        regex: '(metric);.*'
+        target_label: 'host_ip'
+        action: replace
+        replacement: $2
+
+  serviceMonitor:
+    additionalLabels:
+      app.kubernetes.io/vendor: kubesphere
+
+  # prometheus config to set where the ruler will send ALERTS and ALERTS_FOR_STATE metrics.
+  # The metrics have to be sent all prometheus replicas.
+  prometheus:
+    name: k8s
+    namespace: kubesphere-monitoring-system
+    port: 9090
+    # The prometheus replicas. It is just for generating remote write config.
+    # If you want to control it by yourself, please firstly configure the replicasAutoGet item as false.
+    replicas: 1
+    # If true, will ignore the upper replicas item and auto get the prometheus replicas.
+    replicasAutoGet: true
+  
+  # If specified, ignore the upper prometheus config
+  # refer to https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+  remoteWriteConfig: null
+    # remote_write:
+    # - url: "http://prometheus-k8s-0.prometheus-operated.kubesphere-monitoring-system.svc:9090/api/v1/write"
+
+  queryEndpoints:
+  - http://prometheus-operated.{{ .Values.ruler.prometheus.namespace }}.svc:{{ .Values.ruler.prometheus.port }}

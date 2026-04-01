@@ -1,0 +1,122 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.thanos-store.tmpl" }}
+
+{{- $storeTargetNamespace := .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: thanos-store
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "thanos-store" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.ThanosStoreGrpcErrorRate | default false) }}
+  - alert: ThanosStoreGrpcErrorRate
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Store {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} is failing to handle {{`{{`}}$value | humanize{{`}}`}}% of requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosstoregrpcerrorrate
+      summary: Thanos Store is failing to handle gRPC requests.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(grpc_server_handled_total{grpc_code=~"Unknown|Internal|Unavailable|DataLoss|DeadlineExceeded", job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(grpc_server_started_total{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m]))
+      * 100 > 5
+      )
+    for: 5m
+    id: a446958121da972f1647602103c1fc21
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosStoreSeriesGateLatencyHigh | default false) }}
+  - alert: ThanosStoreSeriesGateLatencyHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Store {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} has a 99th percentile latency of {{`{{`}}$value{{`}}`}} seconds for store series gate requests.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosstoreseriesgatelatencyhigh
+      summary: Thanos Store has high latency for store series gate requests.
+    expr: |-
+      (
+        histogram_quantile(0.99, sum by (cluster, namespace, job, le) (rate(thanos_bucket_store_series_gate_duration_seconds_bucket{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m]))) > 2
+      and
+        sum by (cluster, namespace, job) (rate(thanos_bucket_store_series_gate_duration_seconds_count{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m])) > 0
+      )
+    for: 10m
+    id: e9ced22c9ad37e5d941dd50fb42bbaea
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosStoreBucketHighOperationFailures | default false) }}
+  - alert: ThanosStoreBucketHighOperationFailures
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Store {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} Bucket is failing to execute {{`{{`}}$value | humanize{{`}}`}}% of operations.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosstorebuckethighoperationfailures
+      summary: Thanos Store Bucket is failing to execute operations.
+    expr: |-
+      (
+        sum by (cluster, namespace, job) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m]))
+      /
+        sum by (cluster, namespace, job) (rate(thanos_objstore_bucket_operations_total{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m]))
+      * 100 > 5
+      )
+    for: 15m
+    id: 6dea851848b36ff72bd7e49705296177
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.ThanosStoreObjstoreOperationLatencyHigh | default false) }}
+  - alert: ThanosStoreObjstoreOperationLatencyHigh
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Thanos Store {{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.cluster{{`}}`}}/{{`{{`}}$labels.namespace{{`}}`}} Bucket has a 99th percentile latency of {{`{{`}}$value{{`}}`}} seconds for the bucket operations.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/thanos/thanosstoreobjstoreoperationlatencyhigh
+      summary: Thanos Store is having high latency for bucket operations.
+    expr: |-
+      (
+        histogram_quantile(0.99, sum by (cluster, namespace, job, le) (rate(thanos_objstore_bucket_operation_duration_seconds_bucket{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m]))) > 2
+      and
+        sum by (cluster, namespace, job) (rate(thanos_objstore_bucket_operation_duration_seconds_count{job=~".*(thanos-store|store-whizard).*", namespace="{{ $storeTargetNamespace }}"}[5m])) > 0
+      )
+    for: 10m
+    id: 4850e61d863e57de1d027198b900c4ff
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

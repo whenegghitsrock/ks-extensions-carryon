@@ -1,0 +1,155 @@
+{{- /*
+Do not change in-place! In order to change this file first read following link:
+https://github.com/WhizardTelemetry/WhizardAlerting/tree/main/charts/whizard-alerting/hack
+*/ -}}
+{{- define "whizard-alerting.builtinRules.groups.prometheus-operator.tmpl" }}
+
+{{- $operatorJob := printf "%s" "prometheus-operator" }}
+{{- $namespace := printf "%s" .Values.builtinRules.prometheusStackTarget.namespace }}
+apiVersion: alerting.kubesphere.io/v2beta1
+kind: GlobalRuleGroup
+metadata:
+  {{- if .Values.builtinRules.heritageNameOverride }}
+  name: prometheus-operator
+  {{- else }}
+  name: {{ printf "%s-%s" (include "extension.fullname" .) "prometheus-operator" | trunc 63 | trimSuffix "-" }}
+  {{- end }}
+  labels:
+    alerting.kubesphere.io/builtin: "true"
+    alerting.kubesphere.io/enable: "true"
+{{- if .Values.builtinRules.labels }}
+{{ toYaml .Values.builtinRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.builtinRules.annotations }}
+{{ toYaml .Values.builtinRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorListErrors | default false) }}
+  - alert: PrometheusOperatorListErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Errors while performing List operations in controller {{`{{`}}$labels.controller{{`}}`}} in {{`{{`}}$labels.namespace{{`}}`}} namespace.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatorlisterrors
+      summary: Errors while performing list operations in controller.
+    expr: (sum by (controller,namespace,cluster) (rate(prometheus_operator_list_operations_failed_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[10m])) / sum by (controller,namespace,cluster) (rate(prometheus_operator_list_operations_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[10m]))) > 0.4
+    for: 15m
+    id: 6434951db224a2bf20dca8e27951a6c6
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorWatchErrors | default false) }}
+  - alert: PrometheusOperatorWatchErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Errors while performing watch operations in controller {{`{{`}}$labels.controller{{`}}`}} in {{`{{`}}$labels.namespace{{`}}`}} namespace.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatorwatcherrors
+      summary: Errors while performing watch operations in controller.
+    expr: (sum by (controller,namespace,cluster) (rate(prometheus_operator_watch_operations_failed_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m])) / sum by (controller,namespace,cluster) (rate(prometheus_operator_watch_operations_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]))) > 0.4
+    for: 15m
+    id: 5bf4e154b275e355b444342e9134505d
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorSyncFailed | default false) }}
+  - alert: PrometheusOperatorSyncFailed
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Controller {{`{{`}} $labels.controller {{`}}`}} in {{`{{`}} $labels.namespace {{`}}`}} namespace fails to reconcile {{`{{`}} $value {{`}}`}} objects.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatorsyncfailed
+      summary: Last controller reconciliation failed
+    expr: min_over_time(prometheus_operator_syncs{status="failed",job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]) > 0
+    for: 10m
+    id: fc63b335443718bbf66ce8610762d29f
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorReconcileErrors | default false) }}
+  - alert: PrometheusOperatorReconcileErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of reconciling operations failed for {{`{{`}} $labels.controller {{`}}`}} controller in {{`{{`}} $labels.namespace {{`}}`}} namespace.'
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatorreconcileerrors
+      summary: Errors while reconciling controller.
+    expr: (sum by (controller,namespace,cluster) (rate(prometheus_operator_reconcile_errors_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]))) / (sum by (controller,namespace,cluster) (rate(prometheus_operator_reconcile_operations_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]))) > 0.1
+    for: 10m
+    id: c588b3706841edc0a495aafbce7574c4
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorNodeLookupErrors | default false) }}
+  - alert: PrometheusOperatorNodeLookupErrors
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Errors while reconciling Prometheus in {{`{{`}} $labels.namespace {{`}}`}} Namespace.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatornodelookuperrors
+      summary: Errors while reconciling Prometheus.
+    expr: rate(prometheus_operator_node_address_lookup_errors_total{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]) > 0.1
+    for: 10m
+    id: ae4a4a44956fda827f43df1f76990fe1
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorNotReady | default false) }}
+  - alert: PrometheusOperatorNotReady
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Prometheus operator in {{`{{`}} $labels.namespace {{`}}`}} namespace isn't ready to reconcile {{`{{`}} $labels.controller {{`}}`}} resources.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatornotready
+      summary: Prometheus operator not ready
+    expr: min by (controller,namespace,cluster) (max_over_time(prometheus_operator_ready{job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]) == 0)
+    for: 5m
+    id: 3539a37778aeda49796c61bc8a62e791
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- if not (.Values.builtinRules.disabled.PrometheusOperatorRejectedResources | default false) }}
+  - alert: PrometheusOperatorRejectedResources
+    annotations:
+{{- if .Values.builtinRules.additionalRuleAnnotations }}
+{{ toYaml .Values.builtinRules.additionalRuleAnnotations | indent 6 }}
+{{- end }}
+      description: Prometheus operator in {{`{{`}} $labels.namespace {{`}}`}} namespace rejected {{`{{`}} printf "%0.0f" $value {{`}}`}} {{`{{`}} $labels.controller {{`}}`}}/{{`{{`}} $labels.resource {{`}}`}} resources.
+      runbook_url: {{ trimAll "/" .Values.builtinRules.runbookUrl }}/prometheus-operator/prometheusoperatorrejectedresources
+      summary: Resources rejected by Prometheus operator
+    expr: min_over_time(prometheus_operator_managed_resources{state="rejected",job="{{ $operatorJob }}",namespace="{{ $namespace }}"}[5m]) > 0
+    for: 5m
+    id: 3357d98377c72df2ffcda6d58cce1d00
+    labels:
+{{- if .Values.builtinRules.additionalRuleLabels }}
+{{ toYaml .Values.builtinRules.additionalRuleLabels | indent 6 }}
+{{- end }}
+    severity: warning
+{{- end }}
+{{- end }}

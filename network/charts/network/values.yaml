@@ -11,7 +11,7 @@ apiserver:
     type: ClusterIP
     port: 8080
   # image:
-  #   registry: dockerhub.kubekey.local
+  #   registry: registry.cn-beijing.aliyuncs.com
   #   repository: kse/network-extension-apiserver
   #   tag: "v1.1.0"
   #   pullPolicy: IfNotPresent
@@ -29,7 +29,7 @@ controller:
     type: ClusterIP
     port: 443
   # image:
-  #   registry: dockerhub.kubekey.local
+  #   registry: registry.cn-beijing.aliyuncs.com
   #   repository: kse/network-extension-controller
   #   tag: "v1.1.0"
   #   pullPolicy: IfNotPresent

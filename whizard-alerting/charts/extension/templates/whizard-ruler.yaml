@@ -1,0 +1,163 @@
+{{- if .Values.ruler.enabled -}}
+{{- if eq (include "extension.distributionMode" .) "None" }}
+apiVersion: monitoring.whizard.io/v1alpha1
+kind: Ruler
+metadata:
+  name: {{ include "extension.fullname" . }}
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    app: {{ include "extension.fullname" . }}-ruler
+    {{- include "extension.labels" . | nindent 4 }}
+    "monitoring.whizard.io/service": "{{ .Values.ruler.whizardService.namespace }}.{{ .Values.ruler.whizardService.name }}"
+spec:
+  image: {{ include "extension.ruler.image" . }}
+  imagePullPolicy: {{ .Values.ruler.image.pullPolicy }}
+  replicas: {{ .Values.ruler.replicas }}
+  {{- with (include "extension.ruler.imagePullSecrets" .) }}
+  imagePullSecrets:
+    {{- . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.ruler.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ruler.podSecurityContext }}
+  securityContext:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with (include "extension.ruler.nodeSelector" .) }}
+  nodeSelector:
+    {{- . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ruler.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ruler.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  
+  {{- $reloaderContainer := include "extension.ruler.configReloader.container" $ | fromYaml }}
+  {{- $writeProxyContainer := include "extension.ruler.writeProxy.container" $ | fromYaml }}
+
+  {{- if .Values.ruler.containers }}
+  {{- $containers := list }}
+  {{- range $_, $container := .Values.ruler.containers }}
+    {{- if eq $container.name $reloaderContainer.name }}
+      {{- $reloaderContainer = mergeOverwrite $reloaderContainer $container }}
+    {{- else if eq $container.name $writeProxyContainer.name }}
+      {{- $writeProxyContainer = mergeOverwrite $writeProxyContainer $container }}
+    {{- else }}
+      {{- $containers = append $containers $container }}
+    {{- end }}
+  {{- end }}
+  {{- $containers = append $containers $reloaderContainer }}
+  {{- $containers = append $containers $writeProxyContainer }}
+  {{- with $containers }}
+  containers:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  rulerWriteProxy:
+    image: {{ $writeProxyContainer.image }}
+    {{- with $writeProxyContainer.resources }}
+    resources:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  prometheusConfigReloader:
+    image: {{ $reloaderContainer.image }}
+    {{- with $reloaderContainer.resources }}
+    resources:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+
+  logLevel: {{ .Values.ruler.logLevel }}
+  logFormat: {{ .Values.ruler.logFormat }}
+
+  shards: {{ .Values.ruler.shards }}
+  
+  evaluationInterval: {{ .Values.ruler.evaluationInterval }}
+
+  {{- with .Values.ruler.additionalFlags }}
+  flags:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  {{- with .Values.ruler.dataVolume }}
+  dataVolume:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  ruleNamespaceSelector:
+    {{- toYaml .Values.ruler.ruleNamespaceSelector | nindent 4 }}
+
+  {{- if eq (kindOf .Values.ruler.ruleSelector) "map" }}
+  {{- with (list .Values.ruler.ruleSelector) }}
+  ruleSelectors:
+    {{- toYaml . | nindent 4  }}
+  {{- end }}
+  {{- end }}
+
+  flags:
+  {{- if .Values.ruler.alertmanagers }}
+  - |
+    --alertmanagers.config=
+      alertmanagers:
+      {{- toYaml .Values.ruler.alertmanagers | nindent 8 }}
+  {{- else }}
+  {{- range .Values.ruler.alertmanagersUrl }}
+  - '--alertmanagers.url={{ . }}'
+  {{- end }}
+  {{- end }}
+  {{- range .Values.ruler.additionalArgs }}
+  {{- if .value }}
+  - |
+    --{{ .name }}=
+      {{- toYaml .value | nindent 6}}
+  {{- else }}
+  - --{{.name}}
+  {{- end }}
+  {{- end }}
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "extension.fullname" . }}-ruler
+  namespace: {{ include "extension.namespace" . }}
+  labels:
+    {{- include "extension.labels" . | nindent 4 }}
+    {{- with .Values.ruler.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ruler
+  namespaceSelector:
+    matchNames:
+      - {{ printf "%s" (include "extension.namespace" .) | quote }}
+  endpoints:
+  - port: http
+    {{- if .Values.ruler.serviceMonitor.interval }}
+    interval: {{ .Values.ruler.serviceMonitor.interval }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.scheme }}
+    scheme: {{ .Values.ruler.serviceMonitor.scheme }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.bearerTokenFile }}
+    bearerTokenFile: {{ .Values.ruler.serviceMonitor.bearerTokenFile }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.tlsConfig }}
+    tlsConfig: {{- toYaml .Values.ruler.serviceMonitor.tlsConfig | nindent 6 }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.metricRelabelings }}
+    metricRelabelings: {{- tpl (toYaml .Values.ruler.serviceMonitor.metricRelabelings | nindent 6) . }}
+    {{- end }}
+    {{- if .Values.ruler.serviceMonitor.relabelings }}
+    relabelings: {{- toYaml .Values.ruler.serviceMonitor.relabelings | nindent 6 }}
+    {{- end }}
+{{- end }}
+{{- end }}

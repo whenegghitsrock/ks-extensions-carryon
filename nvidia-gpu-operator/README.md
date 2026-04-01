@@ -51,7 +51,7 @@ kubesphereon/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04
 kubesphereon/kubevirt-gpu-device-plugin:v1.2.4
 ```
 
-Finally, update the extension configuration to replace default image URLs with your private registry paths. For example, if your registry is `dockerhub.kubekey.local/kse`, modify `kubesphereon/gpu-operator:v23.9.2` to `dockerhub.kubekey.local/kse/nvidia/gpu-operator:v23.9.2`.
+Finally, update the extension configuration to replace default image URLs with your private registry paths. For example, if your registry is `registry.cn-beijing.aliyuncs.com/kse`, modify `kubesphereon/gpu-operator:v23.9.2` to `registry.cn-beijing.aliyuncs.com/kse/nvidia/gpu-operator:v23.9.2`.
 
 > Note: The `driver.version` field excludes system suffixes.
 
@@ -61,75 +61,75 @@ Sample configuration:
 gpu-operator:
   validator:
     image: gpu-operator-validator
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   operator:
-    repository: dockerhub.kubekey.local/kse/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
     image: gpu-operator
     initContainer:
       image: cuda
-      repository: dockerhub.kubekey.local/kse/nvidia
+      repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
   driver:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
     version: 550-5.15.0-131-generic                  # Excludes system suffix
     manager:
       image: k8s-driver-manager
-      repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+      repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   toolkit:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia/k8s
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/k8s
     image: container-toolkit
   devicePlugin:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
     image: k8s-device-plugin
   dcgm:
     enabled: false
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   dcgmExporter:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia/k8s
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/k8s
     image: dcgm-exporter
   gfd:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
     image: gpu-feature-discovery
   migManager:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
     image: k8s-mig-manager
   nodeStatusExporter:
     enabled: false
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
     image: gpu-operator-validator
   gds:
     enabled: false
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   vgpuManager:
     enabled: false
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
     driverManager:
-      repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+      repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   vgpuDeviceManager:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   kataManager:
     enabled: false
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   vfioManager:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
     driverManager:
-      repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+      repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   sandboxDevicePlugin:
     enabled: true
-    repository: dockerhub.kubekey.local/kse/nvidia
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia
   ccManager:
     enabled: false
-    repository: dockerhub.kubekey.local/kse/nvidia/cloud-native
+    repository: registry.cn-beijing.aliyuncs.com/kse/nvidia/cloud-native
   node-feature-discovery:
     image:
-      repository: dockerhub.kubekey.local/kse/kubesphere/node-feature-discovery
+      repository: registry.cn-beijing.aliyuncs.com/kse/kubesphere/node-feature-discovery
 ```
 
 ### Enable GPU Monitoring with **WizTelemetry Monitoring**
