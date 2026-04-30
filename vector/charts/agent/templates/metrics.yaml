@@ -1,0 +1,15 @@
+{{ if .Values.exportMetrics.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vector-metrics-{{  include "config.role" . | lower  }}
+  namespace: {{ include "vector.namespaceOverride" . }}
+  labels:
+    {{- include "vector.config.labels" . | nindent 4 }}
+stringData:
+  metrics.yaml: |
+    sources:
+    {{- toYaml .Values.exportMetrics.sources | nindent 6 }}
+    sinks:
+    {{- toYaml .Values.exportMetrics.sinks | nindent 6 }}
+{{ end }}

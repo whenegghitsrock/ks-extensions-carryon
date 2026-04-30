@@ -1,0 +1,65 @@
+{{/*namespace*/}}
+{{- define "vector.namespaceOverride" -}}
+  {{- if .Values.namespaceOverride -}}
+    {{- .Values.namespaceOverride -}}
+  {{- else -}}
+    {{- .Release.Namespace -}}
+  {{- end -}}
+{{- end -}}
+
+
+
+{{/*service-headless ports*/}}
+{{- define "vector.ports.filterNodePort" -}}
+{{- range $port := .Values.service.ports }}
+- name: {{ $port.name }}
+  port: {{ $port.port }}
+  protocol: {{ $port.protocol }}
+  targetPort: {{ $port.targetPort }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Common labels.
+*/}}
+{{- define "vector.config.labels" -}}
+  {{- if or (eq .Values.role "Aggregator") (eq .Values.role "Stateless-Aggregator") }}
+logging.whizard.io/vector-role: Aggregator
+logging.whizard.io/enable: "true"
+  {{- end }}
+  {{- if eq .Values.role "Agent" }}
+logging.whizard.io/vector-role: Agent
+logging.whizard.io/enable: "true"
+  {{- end }}
+{{- end }}
+
+
+{{- define "global.imageRegistry" -}}
+{{- $registry := default .Values.global.imageRegistry .Values.imageRegistryOverride }}
+  {{- if $registry -}}
+    {{- printf "%s/" $registry -}}
+  {{- end -}}
+{{- end -}}
+
+
+{{- define "common.nodeSelectors" -}}
+{{- if or (eq .Values.role "Aggregator") (eq .Values.role "Stateless-Aggregator") }}
+{{- $selector := default .Values.global.nodeSelector .Values.nodeSelector }}
+{{- if $selector }}
+nodeSelector:
+{{ toYaml $selector | indent 2 }}
+{{- end }}
+{{- else if and  (eq .Values.role "Agent") .Values.nodeSelector }}
+nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 2 }}
+{{- end }}
+{{- end -}}
+
+
+{{- define "config.role" -}}
+{{- if or (eq .Values.role "Aggregator") (eq .Values.role "Stateless-Aggregator") }}
+{{- printf "%s" "Aggregator" }}
+{{- else }}
+{{- printf "%s" .Values.role }}
+{{- end }}
+{{- end }}

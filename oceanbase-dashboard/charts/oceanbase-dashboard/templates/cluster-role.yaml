@@ -1,0 +1,64 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-cluster-role
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "oceanbase-dashboard.labels" . | nindent 4}}
+rules:
+  # Used by dashboard beckend
+  - apiGroups:
+      - oceanbase.oceanbase.com
+    resources:
+      - "*"
+    verbs: ["get", "list", "watch", "update", "create", "delete", "patch"]
+  - apiGroups:
+      - k8s.oceanbase.com
+    resources:
+      - "*"
+    verbs: ["get", "list", "watch", "update", "create", "delete", "patch"]
+  - apiGroups:
+      - ""
+    resources:
+      - events
+      - secrets
+      - namespaces
+      - configmaps
+      - services
+      - pods/exec
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups:
+      - "apps"
+    resources:
+      - deployments
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups:
+      - "storage.k8s.io"
+    resources:
+      - storageclasses
+    verbs: ["get", "list", "watch"]
+
+  # Used by bundled prometheus
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics"]
+    verbs: ["get"]

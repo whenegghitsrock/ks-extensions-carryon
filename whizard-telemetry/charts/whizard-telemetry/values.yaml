@@ -1,0 +1,150 @@
+# Default values for whizard-telemetry.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Override the deployment name
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+
+global:
+  ## Global image registry to use if it needs to be overridden for some specific use cases (e.g local registries, custom images, ...)
+  ##
+  imageRegistry: ""
+
+  ## Reference to one or more secrets to be used when pulling images
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+  # - name: "image-pull-secret"
+  # or
+  # - "image-pull-secret"
+  nodeSelector: {}
+
+## Enable Kubesphere extension registration
+##
+kubeSphereExtensionEnabled: true
+
+config:
+  kubesphere:
+    host: http://ks-apiserver.kubesphere-system.svc:80
+  monitoring:
+    enabled: true
+    kind: 0     # 0: KubeSphere ReverseProxy, 1: Single Prometheus, 2: Whizard, 3: External
+    endpoint: http://prometheus-k8s.kubesphere-monitoring-system.svc:9090
+  observability:
+    enabled: false
+    endpoint: "http://query-frontend-whizard-operated.kubesphere-monitoring-system.svc:10902"
+    configs:
+      endpoint: "http://whizard-adapter.kubesphere-monitoring-system.svc:8080/api/v1"
+  externalMonitoringTemplate:
+    enabled: false
+    path: ""    # path and content are mutually exclusive. extraVolumeMounts and extraVolumes are configured, so you can load externalMonitoringTemplate through path.
+    content: {}
+  notification:
+    enabled: true
+    endpoint: http://notification-manager-svc.kubesphere-monitoring-system.svc:19093
+  events:
+    enable: true
+    servers:
+      - elasticsearch:
+          endpoints:
+            - https://opensearch-cluster-data.kubesphere-logging-system:9200
+          version: opensearchv2
+          indexPrefix: "{{ .cluster }}-events"
+          timestring: "%Y.%m.%d"
+          basicAuth: true
+          username: admin
+          password: admin
+  logging:
+    enable: true
+    servers:
+      - elasticsearch:
+          endpoints:
+            - https://opensearch-cluster-data.kubesphere-logging-system:9200
+          version: opensearchv2
+          indexPrefix: "{{ .cluster }}-logs"
+          timestring: "%Y.%m.%d"
+          basicAuth: true
+          username: admin
+          password: admin
+
+apiserver:
+  replicaCount: 1
+
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: kubesphereon/whizard-telemetry-apiserver
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 9090
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 20m
+      memory: 50Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  extraVolumeMounts: []
+  ## Additional volumeMounts to the apiserver container.
+  #  - name: example-config
+  #   mountPath: /etc/kubesphere/example
+
+  extraVolumes: []
+  ## Additional volumes to the apiserver pod.
+  #  - name: example-config
+  #    emptyDir: {}
+
+rbac:
+  create: true
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# For KubeSphere RBAC
+ksRbac:
+  create: true
+
+ksServiceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

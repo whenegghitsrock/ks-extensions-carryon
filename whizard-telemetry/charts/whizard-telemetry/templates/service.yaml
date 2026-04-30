@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "whizard-telemetry.fullname" . }}-apiserver
+  namespace: {{ include "whizard-telemetry.namespace" . }}
+  labels:
+    app: whizard-telemetry-apiserver
+    tier: backend    
+    {{- include "whizard-telemetry.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apiserver.service.type }}
+  ports:
+    - port: {{ .Values.apiserver.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: whizard-telemetry-apiserver
+    tier: backend  
+    {{- include "whizard-telemetry.selectorLabels" . | nindent 4 }}

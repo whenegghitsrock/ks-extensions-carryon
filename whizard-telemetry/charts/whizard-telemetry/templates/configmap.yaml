@@ -1,0 +1,52 @@
+{{- if .Values.config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "whizard-telemetry.fullname" . }}-config
+  namespace: {{ include "whizard-telemetry.namespace" . }}
+  labels:
+    {{- include "whizard-telemetry.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+  {{- if .Values.config.observability.enabled }}  
+    observability:
+      enable: true
+      configs:
+        endpoint: {{ .Values.config.observability.configs.endpoint }}
+    monitoring:
+      kind: 2
+      endpoint: {{ .Values.config.observability.endpoint }}
+  {{- else if .Values.config.monitoring.enabled }}  
+    monitoring:
+      kind: {{ .Values.config.monitoring.kind }}
+      endpoint: {{ .Values.config.monitoring.endpoint }}
+  {{- end }}
+    notification:
+{{- toYaml .Values.config.notification | nindent 6 }}
+    logging:
+{{- toYaml .Values.config.logging | nindent 6 }}
+    auditing:
+{{- toYaml .Values.config.auditing | nindent 6 }}
+    events:
+{{- toYaml .Values.config.events | nindent 6 }}
+    kubesphere:
+      host: {{ .Values.config.kubesphere.host }}
+    {{- if .Values.config.kubesphere.username }}
+      username: {{ .Values.config.kubesphere.username }}
+    {{- end }}
+    {{- if .Values.config.kubesphere.password }}
+      password: {{ .Values.config.kubesphere.password }}
+    {{- end }}
+{{- if .Values.config.externalMonitoringTemplate.enabled }} 
+    template:
+{{- if .Values.config.externalMonitoringTemplate.content }} 
+      file: "/etc/whizard-telemetry/template.yaml"
+{{ else }}
+      file: {{ .Values.config.externalMonitoringTemplate.path }}
+{{- end }}
+{{- end }}
+{{- with .Values.config.externalMonitoringTemplate.content }}
+  template.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}

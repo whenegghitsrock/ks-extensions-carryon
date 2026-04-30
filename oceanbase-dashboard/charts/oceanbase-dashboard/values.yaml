@@ -1,0 +1,27 @@
+initCredentials: true
+# admin's password. If not set, the chart will generate it randomly
+adminPassword: admin
+
+userCredentials:
+userNamespace:
+configNamespace:
+
+service:
+  type: NodePort
+  port: 80
+
+dashboard:
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: "kubesphereon/oceanbase-dashboard"
+    tag: ""
+prometheus:
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: "kubesphereon/prometheus"
+    tag: "v2.51.1"
+alertmanager:
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: "kubesphereon/alertmanager"
+    tag: "v0.27.0"

@@ -1,0 +1,127 @@
+{{- $isSimpleScalable := eq (include "loki.deployment.isScalable" .) "true" -}}
+{{- if and $isSimpleScalable (not .Values.read.legacyReadTarget ) }}
+{{- if ne .Values.deploymentMode "SingleBinary" }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "loki.backendFullname" . }}-hook-sa
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "loki.backendLabels" . | nindent 4 }}
+    app.kubernetes.io/part-of: memberlist
+  annotations:
+    {{- if or (not (empty .Values.loki.annotations)) (not (empty .Values.backend.annotations))}}
+    {{- with .Values.loki.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.backend.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "loki.backendFullname" . }}-hook-clusterrole
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "loki.backendLabels" . | nindent 4 }}
+    app.kubernetes.io/part-of: memberlist
+  annotations:
+    {{- if or (not (empty .Values.loki.annotations)) (not (empty .Values.backend.annotations))}}
+    {{- with .Values.loki.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.backend.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets", "statefulsets/scale"]
+    verbs: ["get", "list", "watch", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "loki.backendFullname" . }}-hook-clusterrolebinding
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "loki.backendLabels" . | nindent 4 }}
+    app.kubernetes.io/part-of: memberlist
+  annotations:
+    {{- if or (not (empty .Values.loki.annotations)) (not (empty .Values.backend.annotations))}}
+    {{- with .Values.loki.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.backend.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "loki.backendFullname" . }}-hook-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "loki.backendFullname" . }}-hook-sa
+    namespace: {{ $.Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "loki.backendFullname" . }}-hook-job
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "loki.backendLabels" . | nindent 4 }}
+    app.kubernetes.io/part-of: memberlist
+  annotations:
+    {{- if or (not (empty .Values.loki.annotations)) (not (empty .Values.backend.annotations))}}
+    {{- with .Values.loki.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.backend.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "4"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+spec:
+  backoffLimit: 6
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        {{- include "loki.backendLabels" . | nindent 8 }}
+        app.kubernetes.io/part-of: memberlist
+    spec:
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: patch-backend
+          image: {{ include "loki.kubectlImage" . }}
+          imagePullPolicy: {{ .Values.kubectlImage.pullPolicy }}
+          command:
+            - /bin/bash
+            - -euc
+            - |
+              kubectl scale statefulset --replicas={{ .Values.backend.replicas }} -n {{ $.Release.Namespace }} {{ template "loki.backendFullname" . }}
+      restartPolicy: OnFailure
+      serviceAccount: {{ template "loki.backendFullname" . }}-hook-sa
+      serviceAccountName: {{ template "loki.backendFullname" . }}-hook-sa
+{{- end }}
+{{- end }}
+

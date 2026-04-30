@@ -1,0 +1,49 @@
+{{- if .Values.kubeSphereExtensionEnabled }}
+{{- if .Values.config.monitoring.enabled }}  
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v1beta1.monitoring.kubesphere.io
+spec:
+  group: monitoring.kubesphere.io
+  url: http://{{ include "whizard-telemetry.fullname" . }}-apiserver.{{ include "whizard-telemetry.namespace" . }}.svc:9090
+  version: v1beta1
+status:
+  state: Available
+{{- end }}
+---
+{{- if .Values.config.observability.enabled }}  
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v1alpha1.monitoring.observability.kubesphere.io
+spec:
+  group: monitoring.observability.kubesphere.io
+  url: http://{{ include "whizard-telemetry.fullname" . }}-apiserver.{{ include "whizard-telemetry.namespace" . }}.svc:9090
+  version: v1alpha1
+status:
+  state: Available
+{{- end }}
+---
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v1alpha2.logging.kubesphere.io
+spec:
+  group: logging.kubesphere.io
+  url: http://{{ include "whizard-telemetry.fullname" . }}-apiserver.{{ include "whizard-telemetry.namespace" . }}.svc:9090
+  version: v1alpha2
+status:
+  state: Available
+---
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v2beta2.notification.kubesphere.io
+spec:
+  group: notification.kubesphere.io
+  url: http://{{ include "whizard-telemetry.fullname" . }}-apiserver.{{ include "whizard-telemetry.namespace" . }}.svc:9090
+  version: v2beta2
+status:
+  state: Available
+{{- end }}
